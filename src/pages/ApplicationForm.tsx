@@ -1,0 +1,256 @@
+import { DashboardLayout } from "@/components/DashboardLayout";
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { CheckCircle2, ChevronRight, Upload, CreditCard, AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
+
+const steps = [
+  { id: 1, name: "Business Details" },
+  { id: 2, name: "Location" },
+  { id: 3, name: "Documents" },
+  { id: 4, name: "Review" },
+  { id: 5, name: "Payment" },
+];
+
+export default function ApplicationForm() {
+  const { serviceId } = useParams();
+  const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleNext = () => {
+    if (currentStep < steps.length) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleSubmit();
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleSubmit = () => {
+    setIsSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      navigate("/dashboard");
+    }, 2000);
+  };
+
+  return (
+    <DashboardLayout role="citizen">
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900">New Application</h2>
+          <p className="text-gray-500">Single Business Permit Application</p>
+        </div>
+
+        {/* Progress Steps */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between relative">
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 -z-10"></div>
+            <div 
+              className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-emerald-600 -z-10 transition-all duration-300"
+              style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
+            ></div>
+            {steps.map((step) => (
+              <div key={step.id} className="flex flex-col items-center bg-gray-50 px-2">
+                <div
+                  className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 transition-colors",
+                    currentStep >= step.id
+                      ? "bg-emerald-600 border-emerald-600 text-white"
+                      : "bg-white border-gray-300 text-gray-500"
+                  )}
+                >
+                  {currentStep > step.id ? <CheckCircle2 className="w-5 h-5" /> : step.id}
+                </div>
+                <span className={cn(
+                  "text-xs mt-2 font-medium hidden sm:block",
+                  currentStep >= step.id ? "text-emerald-600" : "text-gray-500"
+                )}>
+                  {step.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Form Content */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8">
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {currentStep === 1 && (
+              <div className="space-y-6">
+                <h3 className="text-lg font-semibold text-gray-900">Business Details</h3>
+                <div className="grid grid-cols-1 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                    <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. Acme Traders Ltd" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Registration Number</label>
+                    <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. BN-123456" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Business Activity</label>
+                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                      <option>Select activity...</option>
+                      <option>Retail Shop</option>
+                      <option>Restaurant</option>
+                      <option>Consultancy</option>
+                      <option>Transport</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 2 && (
+              <div className="space-y-6">
+                <h3 className="text-lg font-semibold text-gray-900">Location Details</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Sub-County</label>
+                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                      <option>Select Sub-County...</option>
+                      <option>Westlands</option>
+                      <option>Kasarani</option>
+                      <option>Langata</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ward</label>
+                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                      <option>Select Ward...</option>
+                      <option>Kilimani</option>
+                      <option>Kileleshwa</option>
+                    </select>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Physical Address / Plot No.</label>
+                    <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. Plot 209/123, Moi Avenue" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 3 && (
+              <div className="space-y-6">
+                <h3 className="text-lg font-semibold text-gray-900">Required Documents</h3>
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer">
+                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm font-medium text-gray-900">Upload Business Registration Certificate</p>
+                    <p className="text-xs text-gray-500">PDF or JPG up to 5MB</p>
+                  </div>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer">
+                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm font-medium text-gray-900">Upload KRA PIN Certificate</p>
+                    <p className="text-xs text-gray-500">PDF or JPG up to 5MB</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 4 && (
+              <div className="space-y-6">
+                <h3 className="text-lg font-semibold text-gray-900">Review Application</h3>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+                  <div className="flex justify-between border-b border-gray-200 pb-2">
+                    <span className="text-gray-500 text-sm">Service</span>
+                    <span className="font-medium text-gray-900 text-sm">Single Business Permit</span>
+                  </div>
+                  <div className="flex justify-between border-b border-gray-200 pb-2">
+                    <span className="text-gray-500 text-sm">Business Name</span>
+                    <span className="font-medium text-gray-900 text-sm">Acme Traders Ltd</span>
+                  </div>
+                  <div className="flex justify-between border-b border-gray-200 pb-2">
+                    <span className="text-gray-500 text-sm">Location</span>
+                    <span className="font-medium text-gray-900 text-sm">Westlands, Kilimani</span>
+                  </div>
+                  <div className="flex justify-between pt-2">
+                    <span className="text-gray-900 font-semibold">Total Fee</span>
+                    <span className="font-bold text-emerald-600">KES 15,000</span>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-4 bg-blue-50 text-blue-700 rounded-lg text-sm">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                  <p>By submitting this application, you declare that the information provided is true and correct to the best of your knowledge.</p>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 5 && (
+              <div className="space-y-6">
+                <h3 className="text-lg font-semibold text-gray-900">Payment</h3>
+                <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
+                  <p className="text-gray-500 mb-2">Amount Due</p>
+                  <p className="text-3xl font-bold text-gray-900 mb-8">KES 15,000</p>
+                  
+                  <div className="space-y-4">
+                    <button className="w-full flex items-center justify-between px-4 py-3 border border-emerald-500 bg-emerald-50 text-emerald-700 rounded-lg font-medium">
+                      <span className="flex items-center gap-2">
+                        <CreditCard className="w-5 h-5" />
+                        M-Pesa
+                      </span>
+                      <span className="w-4 h-4 rounded-full border-2 border-emerald-600 bg-emerald-600"></span>
+                    </button>
+                    <button className="w-full flex items-center justify-between px-4 py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg font-medium transition-colors">
+                      <span className="flex items-center gap-2">
+                        <CreditCard className="w-5 h-5" />
+                        Credit/Debit Card
+                      </span>
+                      <span className="w-4 h-4 rounded-full border-2 border-gray-300"></span>
+                    </button>
+                  </div>
+
+                  <div className="mt-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 text-left">M-Pesa Phone Number</label>
+                    <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="07XX XXX XXX" defaultValue="0712 345 678" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Navigation Buttons */}
+          <div className="mt-8 flex justify-between pt-6 border-t border-gray-100">
+            <button
+              onClick={handleBack}
+              disabled={currentStep === 1 || isSubmitting}
+              className="px-6 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Back
+            </button>
+            <button
+              onClick={handleNext}
+              disabled={isSubmitting}
+              className="inline-flex items-center px-6 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? (
+                <>Processing...</>
+              ) : currentStep === steps.length ? (
+                <>Pay & Submit</>
+              ) : (
+                <>
+                  Next Step <ChevronRight className="w-4 h-4 ml-1" />
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+}
