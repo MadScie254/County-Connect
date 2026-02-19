@@ -165,10 +165,10 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
                   className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500 w-64"
                 />
               </div>
-              <button className="relative p-2 text-gray-400 hover:text-gray-500">
+              <Link to="/notifications" className="relative p-2 text-gray-400 hover:text-gray-500">
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-              </button>
+              </Link>
             </div>
           </header>
           <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">

@@ -12,12 +12,18 @@ import AdminSettings from "@/pages/AdminSettings";
 import ProcurementDashboard from "@/pages/ProcurementDashboard";
 import TaxCompliance from "@/pages/TaxCompliance";
 import LandRegistry from "@/pages/LandRegistry";
+import Login from "@/pages/auth/Login";
+import Register from "@/pages/auth/Register";
+import UserProfile from "@/pages/UserProfile";
+import Notifications from "@/pages/Notifications";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         
         {/* Citizen Routes */}
         <Route path="/dashboard" element={<CitizenDashboard />} />
@@ -25,6 +31,8 @@ export default function App() {
         <Route path="/apply/:serviceId" element={<ApplicationForm />} />
         <Route path="/tax-compliance" element={<TaxCompliance />} />
         <Route path="/land-registry" element={<LandRegistry />} />
+        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/notifications" element={<Notifications />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminDashboard />} />
@@ -38,7 +46,6 @@ export default function App() {
         {/* Redirects/Fallbacks */}
         <Route path="/applications" element={<Navigate to="/dashboard" />} />
         <Route path="/payments" element={<Navigate to="/dashboard" />} />
-        <Route path="/profile" element={<Navigate to="/dashboard" />} />
       </Routes>
     </BrowserRouter>
   );

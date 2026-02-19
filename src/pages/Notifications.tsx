@@ -1,0 +1,96 @@
+import { DashboardLayout } from "@/components/DashboardLayout";
+import { Bell, CheckCircle2, AlertCircle, Info, Clock } from "lucide-react";
+import { formatDate } from "@/lib/utils";
+
+const notifications = [
+  {
+    id: 1,
+    title: "Application Approved",
+    message: "Your Single Business Permit application (APP-2024-001) has been approved.",
+    type: "success",
+    date: "2024-02-18T10:30:00",
+    read: false,
+  },
+  {
+    id: 2,
+    title: "Payment Received",
+    message: "We received your payment of KES 15,000 for Application APP-2024-001.",
+    type: "info",
+    date: "2024-02-18T10:25:00",
+    read: true,
+  },
+  {
+    id: 3,
+    title: "Action Required",
+    message: "Please upload the missing KRA PIN certificate for your Land Rates application.",
+    type: "warning",
+    date: "2024-02-17T14:15:00",
+    read: false,
+  },
+  {
+    id: 4,
+    title: "System Maintenance",
+    message: "The portal will be undergoing scheduled maintenance on Sunday, 25th Feb.",
+    type: "info",
+    date: "2024-02-15T09:00:00",
+    read: true,
+  },
+];
+
+export default function Notifications() {
+  return (
+    <DashboardLayout role="citizen">
+      <div className="max-w-3xl mx-auto space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Notifications</h2>
+            <p className="text-gray-500">Stay updated on your applications and alerts.</p>
+          </div>
+          <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+            Mark all as read
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {notifications.map((notification) => (
+            <div 
+              key={notification.id} 
+              className={`bg-white p-4 rounded-xl border transition-all ${
+                notification.read ? "border-gray-200" : "border-emerald-200 shadow-sm bg-emerald-50/30"
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className={`p-2 rounded-lg flex-shrink-0 ${
+                  notification.type === 'success' ? 'bg-emerald-100 text-emerald-600' :
+                  notification.type === 'warning' ? 'bg-amber-100 text-amber-600' :
+                  'bg-blue-100 text-blue-600'
+                }`}>
+                  {notification.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> :
+                   notification.type === 'warning' ? <AlertCircle className="w-5 h-5" /> :
+                   <Info className="w-5 h-5" />}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className={`font-semibold ${notification.read ? "text-gray-900" : "text-gray-900"}`}>
+                      {notification.title}
+                    </h3>
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {new Date(notification.date).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {notification.message}
+                  </p>
+                </div>
+                {!notification.read && (
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2"></div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+}
