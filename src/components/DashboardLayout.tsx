@@ -13,10 +13,10 @@ import {
   Briefcase,
   ShieldCheck,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -26,6 +26,31 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children, role }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!sidebarOpen) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [sidebarOpen]);
 
   const citizenLinks = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -47,6 +72,73 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
 
   const links = role === "admin" ? adminLinks : citizenLinks;
 
+  const sidebarContent = (
+    <>
+      <div className="flex items-center gap-2 px-6 h-16 border-b border-gray-200">
+        <ShieldCheck className="w-6 h-6 text-emerald-600" />
+        <span className="font-bold text-lg tracking-tight">CountyConnect</span>
+      </div>
+
+      <div className="p-4">
+        <div className="mb-6 px-2">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+            {role === "admin" ? "Administration" : "Citizen Portal"}
+          </p>
+          <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 border border-gray-100">
+            <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs">
+              {role === "admin" ? "AD" : "JD"}
+            </div>
+            <div className="overflow-hidden">
+              <p className="text-sm font-medium truncate">
+                {role === "admin" ? "Admin User" : "John Doe"}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {role === "admin" ? "admin@county.go.ke" : "john@example.com"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <nav className="space-y-1">
+          {links.map((link) => {
+            const isActive = location.pathname === link.href;
+            return (
+              <Link
+                key={link.name}
+                to={link.href}
+                onClick={() => setSidebarOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                  isActive
+                    ? "bg-emerald-50 text-emerald-700"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                )}
+              >
+                <link.icon
+                  className={cn(
+                    "w-5 h-5",
+                    isActive ? "text-emerald-600" : "text-gray-400"
+                  )}
+                />
+                {link.name}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+
+      <div className="mt-auto p-4 border-t border-gray-200">
+        <Link
+          to="/"
+          className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-red-50 hover:text-red-600 transition-colors"
+        >
+          <LogOut className="w-5 h-5" />
+          Sign Out
+        </Link>
+      </div>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-900">
       {/* Mobile Header */}
@@ -56,95 +148,47 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
           <span>CountyConnect</span>
         </div>
         <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+          onClick={() => setSidebarOpen((prev) => !prev)}
           className="p-2 rounded-md hover:bg-gray-100"
           aria-label={sidebarOpen ? "Close menu" : "Open menu"}
           aria-expanded={sidebarOpen}
+          aria-controls="mobile-sidebar"
         >
           {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
-      <div className="flex h-screen overflow-hidden">
-        {/* Sidebar */}
+      <div className="flex min-h-screen overflow-hidden">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:flex lg:w-64 lg:flex-col bg-white border-r border-gray-200">
+          {sidebarContent}
+        </aside>
+
+        {/* Mobile Sidebar */}
         <AnimatePresence>
-          {(sidebarOpen || window.innerWidth >= 1024) && (
-            <motion.aside
-              initial={{ x: -300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -300, opacity: 0 }}
-              className={cn(
-                "fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 shadow-lg lg:shadow-none",
-                !sidebarOpen && "hidden lg:block"
-              )}
-            >
-              <div className="flex flex-col h-full">
-                <div className="flex items-center gap-2 px-6 h-16 border-b border-gray-200">
-                  <ShieldCheck className="w-6 h-6 text-emerald-600" />
-                  <span className="font-bold text-lg tracking-tight">
-                    CountyConnect
-                  </span>
-                </div>
+          {sidebarOpen && (
+            <>
+              <motion.button
+                type="button"
+                aria-label="Close sidebar"
+                onClick={() => setSidebarOpen(false)}
+                className="fixed inset-0 bg-black/30 z-40 lg:hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              />
 
-                <div className="p-4">
-                  <div className="mb-6 px-2">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                      {role === "admin" ? "Administration" : "Citizen Portal"}
-                    </p>
-                    <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 border border-gray-100">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs">
-                        {role === "admin" ? "AD" : "JD"}
-                      </div>
-                      <div className="overflow-hidden">
-                        <p className="text-sm font-medium truncate">
-                          {role === "admin" ? "Admin User" : "John Doe"}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          {role === "admin" ? "admin@county.go.ke" : "john@example.com"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <nav className="space-y-1">
-                    {links.map((link) => {
-                      const isActive = location.pathname === link.href;
-                      return (
-                        <Link
-                          key={link.name}
-                          to={link.href}
-                          onClick={() => setSidebarOpen(false)}
-                          className={cn(
-                            "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                            isActive
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                          )}
-                        >
-                          <link.icon
-                            className={cn(
-                              "w-5 h-5",
-                              isActive ? "text-emerald-600" : "text-gray-400"
-                            )}
-                          />
-                          {link.name}
-                        </Link>
-                      );
-                    })}
-                  </nav>
-                </div>
-
-                <div className="mt-auto p-4 border-t border-gray-200">
-                  <Link
-                    to="/"
-                    className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-red-50 hover:text-red-600 transition-colors"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    Sign Out
-                  </Link>
-                </div>
-              </div>
-            </motion.aside>
+              <motion.aside
+                id="mobile-sidebar"
+                initial={{ x: -280 }}
+                animate={{ x: 0 }}
+                exit={{ x: -280 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 shadow-lg lg:hidden flex flex-col"
+              >
+                {sidebarContent}
+              </motion.aside>
+            </>
           )}
         </AnimatePresence>
 
@@ -171,9 +215,7 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
               </Link>
             </div>
           </header>
-          <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-            {children}
-          </div>
+          <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
     </div>
