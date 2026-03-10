@@ -28,6 +28,18 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
   const location = useLocation();
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = (event: MediaQueryListEvent) => {
+      if (event.matches) {
+        setSidebarOpen(false);
+      }
+    };
+
+    mediaQuery.addEventListener("change", closeOnDesktop);
+    return () => mediaQuery.removeEventListener("change", closeOnDesktop);
+  }, []);
+
+  useEffect(() => {
     if (!sidebarOpen) {
       return;
     }
@@ -38,8 +50,13 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
       }
     };
 
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+
+    if (!isDesktop) {
+      document.body.style.overflow = "hidden";
+    }
+
     window.addEventListener("keydown", onKeyDown);
 
     return () => {
@@ -47,6 +64,10 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [sidebarOpen]);
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
   const citizenLinks = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
