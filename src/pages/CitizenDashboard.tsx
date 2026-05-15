@@ -2,6 +2,7 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { ArrowUpRight, Clock, FileCheck, AlertCircle, Plus, Building2, Globe, Car, HardHat, Coins, HeartPulse, MessageSquare, Store } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { getSelectedCounty } from "@/lib/counties";
 
 // Mock Data
 const applications = [
@@ -38,6 +39,8 @@ const services = [
 ];
 
 export default function CitizenDashboard() {
+  const selectedCounty = getSelectedCounty();
+
   return (
     <DashboardLayout role="citizen">
       <div className="space-y-8">
@@ -45,7 +48,7 @@ export default function CitizenDashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Welcome back, John!</h2>
-            <p className="text-gray-500">Here's what's happening with your applications.</p>
+            <p className="text-gray-500">Here's what's happening with your applications in {selectedCounty.name}.</p>
           </div>
           <Link
             to="/applications/new"
