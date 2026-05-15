@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { ArrowUpRight, Clock, FileCheck, AlertCircle, Plus, Building2, Globe, Car, HardHat } from "lucide-react";
+import { ArrowUpRight, Clock, FileCheck, AlertCircle, Plus, Building2, Globe, Car, HardHat, Coins, HeartPulse, MessageSquare, Store } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
@@ -29,10 +29,12 @@ const applications = [
 ];
 
 const services = [
-  { name: "Business Licensing", icon: Building2, desc: "Apply for or renew business permits" },
-  { name: "Land Rates", icon: Globe, desc: "Pay annual land rates and obtain clearance" },
-  { name: "Parking", icon: Car, desc: "Daily and seasonal parking payments" },
-  { name: "Construction", icon: HardHat, desc: "Building plan approvals and permits" },
+  { name: "Business Licensing", icon: Store, desc: "Apply for or renew Single Business Permits", link: "/apply/sbp" },
+  { name: "Land Registry", icon: Globe, desc: "Search parcels and verify ownership chains", link: "/land-registry" },
+  { name: "Tax Compliance", icon: Coins, desc: "Automate SME taxes with KRA Integration", link: "/tax-compliance" },
+  { name: "Social Welfare", icon: HeartPulse, desc: "Verify status and manage benefit wallets", link: "/social-welfare" },
+  { name: "Public Engagement", icon: MessageSquare, desc: "Participate in budget and grievance polls", link: "/engagement" },
+  { name: "Parking", icon: Car, desc: "Daily and seasonal parking payments", link: "/apply/parking" },
 ];
 
 export default function CitizenDashboard() {
@@ -141,7 +143,7 @@ export default function CitizenDashboard() {
             {services.map((service) => (
               <Link
                 key={service.name}
-                to={`/services/${service.name.toLowerCase().replace(" ", "-")}`}
+                to={service.link}
                 className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all group"
               >
                 <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 mb-3 group-hover:scale-110 transition-transform duration-200">

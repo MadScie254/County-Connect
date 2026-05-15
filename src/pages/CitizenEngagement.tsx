@@ -1,0 +1,111 @@
+import { DashboardLayout } from "@/components/DashboardLayout";
+import { MessageSquare, ThumbsUp, Send, Users, FileWarning, HelpCircle } from "lucide-react";
+import { motion } from "motion/react";
+
+export default function CitizenEngagement() {
+  return (
+    <DashboardLayout role="citizen">
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Citizen Engagement Hub</h2>
+          <p className="text-gray-500">Public participation, grievances, and petitions portal.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Active Petitions */}
+          <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <Users className="w-5 h-5 text-emerald-600" />
+                Active Public Participation
+              </h3>
+              <span className="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">3 OPEN</span>
+            </div>
+            <div className="p-6 flex-1 space-y-6">
+              {[
+                { title: "Nairobi County Budget 2026/27", deadline: "Closes in 5 days", supporters: "4,250 citizens signed" },
+                { title: "Westlands Urban Renewal Plan", deadline: "Closes in 12 days", supporters: "1,120 citizens signed" },
+              ].map((p, i) => (
+                <div key={i} className="group cursor-pointer">
+                  <h4 className="font-bold text-gray-900 group-hover:text-emerald-600 transition-colors mb-1">{p.title}</h4>
+                  <div className="flex items-center justify-between text-xs text-gray-500 font-medium">
+                    <span>{p.deadline}</span>
+                    <span className="flex items-center gap-1"><ThumbsUp className="w-3 h-3" /> {p.supporters}</span>
+                  </div>
+                  <div className="mt-3 w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-emerald-500 h-full" style={{ width: i === 0 ? '75%' : '30%' }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="p-6 pt-0">
+               <button className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition flex items-center justify-center gap-2">
+                 Submit Input <Send className="w-4 h-4" />
+               </button>
+            </div>
+          </div>
+
+          {/* Grievance Tracker */}
+          <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <FileWarning className="w-5 h-5 text-red-500" />
+                Grievance & Complaint Portal
+              </h3>
+            </div>
+            <div className="p-8 flex-1 flex flex-col items-center justify-center text-center space-y-4">
+              <div className="p-4 bg-red-50 text-red-500 rounded-full">
+                <MessageSquare className="w-10 h-10" />
+              </div>
+              <div>
+                <h4 className="text-xl font-bold text-gray-900 mb-2">Voice Your Concern</h4>
+                <p className="text-gray-500 text-sm max-w-xs mx-auto">
+                  Report service delivery failures, corruption, or infrastructure issues directly to the Governor's office.
+                </p>
+              </div>
+              <button className="px-8 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition shadow-lg shadow-red-100">
+                Lodge Grievance
+              </button>
+            </div>
+            <div className="p-6 border-t border-gray-50 bg-gray-50/50">
+               <div className="flex items-center justify-between text-xs">
+                 <span className="text-gray-500 font-bold uppercase tracking-widest italic flex items-center gap-1">
+                   <HelpCircle className="w-3 h-3" /> Standard Resolution Time:
+                 </span>
+                 <span className="text-gray-900 font-bold">48 Hours</span>
+               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Feedback Section */}
+        <div className="bg-emerald-50 rounded-3xl p-8 border border-emerald-100 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-8 text-emerald-100">
+             <MessageSquare className="w-24 h-24" />
+          </div>
+          <div className="relative z-10 lg:w-2/3">
+             <h3 className="text-2xl font-bold text-emerald-900 mb-3 tracking-tight italic">Direct-to-Governor Hotline</h3>
+             <p className="text-emerald-800/80 mb-6 font-medium">
+               This portal ensures your constitutional right to public participation. Accountability is our priority. 
+               All submissions are cryptographically signed and tracked.
+             </p>
+             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div>
+                   <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Response Rate</p>
+                   <p className="text-xl font-black text-emerald-900">92%</p>
+                </div>
+                <div>
+                   <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Avg Resolution</p>
+                   <p className="text-xl font-black text-emerald-900">3.5 Days</p>
+                </div>
+                <div>
+                   <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Verified Users</p>
+                   <p className="text-xl font-black text-emerald-900">120K+</p>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+}

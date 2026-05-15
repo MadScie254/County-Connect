@@ -12,6 +12,13 @@ import {
   Building2,
   Briefcase,
   ShieldCheck,
+  HeartPulse,
+  Users,
+  MessageSquare,
+  BarChart3,
+  Globe,
+  Database,
+  Coins,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -28,19 +35,37 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
   const location = useLocation();
 
   const citizenLinks = [
+    { name: "Main Modules", type: "header" },
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Services Catalog", href: "/applications/new", icon: Grid },
     { name: "My Applications", href: "/applications", icon: FileText },
+    
+    { name: "Specialized Portals", type: "header" },
     { name: "Land Registry", href: "/land-registry", icon: Building2 },
-    { name: "Tax Compliance", href: "/tax-compliance", icon: CreditCard },
+    { name: "Tax Compliance (KRA)", href: "/tax-compliance", icon: Coins },
+    { name: "Social Welfare", href: "/social-welfare", icon: HeartPulse },
+    { name: "Citizen Participation", href: "/engagement", icon: MessageSquare },
+    
+    { name: "Account", type: "header" },
     { name: "Payments", href: "/payments", icon: CreditCard },
     { name: "Profile", href: "/profile", icon: User },
   ];
 
   const adminLinks = [
-    { name: "Overview", href: "/admin", icon: LayoutDashboard },
-    { name: "Applications", href: "/admin/applications", icon: FileText },
-    { name: "Procurement", href: "/admin/procurement", icon: Briefcase },
-    { name: "Services", href: "/admin/services", icon: Briefcase },
+    { name: "Administration", type: "header" },
+    { name: "Executive Dashboard", href: "/admin", icon: LayoutDashboard },
+    { name: "Analytics (BI)", href: "/admin/analytics", icon: BarChart3 },
+    { name: "Applications Queue", href: "/admin/applications", icon: FileText },
+    
+    { name: "Verticals", type: "header" },
+    { name: "Procurement (Tenders)", href: "/admin/procurement", icon: Briefcase },
+    { name: "Revenue Collection", href: "/admin/revenue", icon: Coins },
+    { name: "Social Welfare Mgt", href: "/admin/welfare", icon: Users },
+    { name: "Health Management", href: "/admin/health", icon: HeartPulse },
+    
+    { name: "System", type: "header" },
+    { name: "Interoperability Platform", href: "/admin/api-hub", icon: Database },
+    { name: "General Services", href: "/admin/services", icon: Briefcase },
     { name: "Departments", href: "/admin/departments", icon: Building2 },
     { name: "Settings", href: "/admin/settings", icon: Settings },
   ];
@@ -68,25 +93,25 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
       <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
         <AnimatePresence>
-          {(sidebarOpen || window.innerWidth >= 1024) && (
+          {(sidebarOpen || (typeof window !== 'undefined' && window.innerWidth >= 1024)) && (
             <motion.aside
               initial={{ x: -300, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -300, opacity: 0 }}
               className={cn(
-                "fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 shadow-lg lg:shadow-none",
+                "fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 shadow-lg lg:shadow-none overflow-y-auto",
                 !sidebarOpen && "hidden lg:block"
               )}
             >
               <div className="flex flex-col h-full">
-                <div className="flex items-center gap-2 px-6 h-16 border-b border-gray-200">
+                <div className="flex items-center gap-2 px-6 h-16 border-b border-gray-200 flex-shrink-0">
                   <ShieldCheck className="w-6 h-6 text-emerald-600" />
                   <span className="font-bold text-lg tracking-tight">
                     CountyConnect
                   </span>
                 </div>
 
-                <div className="p-4">
+                <div className="flex-1 p-4 overflow-y-auto custom-scrollbar">
                   <div className="mb-6 px-2">
                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
                       {role === "admin" ? "Administration" : "Citizen Portal"}
@@ -107,8 +132,18 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
                   </div>
 
                   <nav className="space-y-1">
-                    {links.map((link) => {
+                    {links.map((link, idx) => {
+                      if (link.type === "header") {
+                        return (
+                          <p key={idx} className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-6 mb-2 px-3">
+                            {link.name}
+                          </p>
+                        );
+                      }
+                      
                       const isActive = location.pathname === link.href;
+                      const Icon = link.icon;
+
                       return (
                         <Link
                           key={link.name}
@@ -117,16 +152,18 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
                           className={cn(
                             "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
                             isActive
-                              ? "bg-emerald-50 text-emerald-700"
+                              ? "bg-emerald-50 text-emerald-700 shadow-sm"
                               : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                           )}
                         >
-                          <link.icon
-                            className={cn(
-                              "w-5 h-5",
-                              isActive ? "text-emerald-600" : "text-gray-400"
-                            )}
-                          />
+                          {Icon && (
+                            <Icon
+                              className={cn(
+                                "w-5 h-5",
+                                isActive ? "text-emerald-600" : "text-gray-400"
+                              )}
+                            />
+                          )}
                           {link.name}
                         </Link>
                       );
@@ -161,11 +198,11 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search services, tenders..."
                   className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500 w-64"
                 />
               </div>
-              <Link to="/notifications" className="relative p-2 text-gray-400 hover:text-gray-500">
+              <Link to="/notifications" className="relative p-2 text-gray-400 hover:text-gray-500" aria-label="Notifications">
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
               </Link>
@@ -179,3 +216,23 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
     </div>
   );
 }
+
+const Grid = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect width="7" height="7" x="3" y="3" rx="1" />
+    <rect width="7" height="7" x="14" y="3" rx="1" />
+    <rect width="7" height="7" x="14" y="14" rx="1" />
+    <rect width="7" height="7" x="3" y="14" rx="1" />
+  </svg>
+);
