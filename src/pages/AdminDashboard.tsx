@@ -98,7 +98,7 @@ export default function AdminDashboard() {
           <div className="bg-white p-8 rounded-[2.5rem] border border-gray-200 shadow-sm flex flex-col h-full">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-xl font-black text-gray-900 tracking-tight italic">Consolidated Revenue (7D)</h3>
-              <select className="bg-gray-50 border border-gray-100 text-[10px] font-black rounded-lg px-2 py-1 uppercase italic focus:outline-none focus:ring-0">
+              <select aria-label="Revenue time range" className="bg-gray-50 border border-gray-100 text-[10px] font-black rounded-lg px-2 py-1 uppercase italic focus:outline-none focus:ring-0">
                 <option>Week Stream</option>
               </select>
             </div>
@@ -224,7 +224,8 @@ export default function AdminDashboard() {
                        </span>
                     </td>
                     <td className="px-8 py-5 text-right">
-                       <button className="px-4 py-1.5 bg-gray-50 text-gray-400 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition shadow-none hover:shadow-lg hover:shadow-emerald-200">
+                       <button aria-label="Open application details" className="px-4 py-1.5 bg-gray-50 text-gray-400 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition shadow-none hover:shadow-lg hover:shadow-emerald-200">
+                          <span className="sr-only">Open application details</span>
                           <ArrowUpRight className="w-4 h-4" />
                        </button>
                     </td>

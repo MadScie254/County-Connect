@@ -64,7 +64,6 @@ export const COUNTY_PROFILES: CountyProfile[] = [
   { slug: "trans-nzoia", name: "Trans Nzoia County", region: "Rift Valley", tier: "access", launchNote: "Agricultural and market fee automation." },
   { slug: "vihiga", name: "Vihiga County", region: "Western", tier: "access", launchNote: "Compact county deployment with quick wins." },
   { slug: "siaya", name: "Siaya County", region: "Nyanza", tier: "access", launchNote: "Citizen-facing service and revenue recovery support." },
-  { slug: "all", name: "County-Wide Reference Bundle", region: "National", tier: "metro", launchNote: "Best for comparative demos and procurement previews." },
 ];
 
 const COUNTY_PRICING: Record<CountyTier, CountyPackages> = {
