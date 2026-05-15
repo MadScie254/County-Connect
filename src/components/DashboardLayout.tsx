@@ -16,6 +16,7 @@ import {
 import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "motion/react";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -65,22 +66,18 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
       </div>
 
       <div className="flex h-screen overflow-hidden">
-        {sidebarOpen && (
-          <button
-            type="button"
-            aria-label="Close sidebar"
-            onClick={() => setSidebarOpen(false)}
-            className="fixed inset-0 bg-black/30 z-20 lg:hidden"
-          />
-        )}
-
         {/* Sidebar */}
-        <aside
-          className={cn(
-            "fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out shadow-lg lg:shadow-none lg:static lg:inset-0 lg:translate-x-0",
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          )}
-        >
+        <AnimatePresence>
+          {(sidebarOpen || window.innerWidth >= 1024) && (
+            <motion.aside
+              initial={{ x: -300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -300, opacity: 0 }}
+              className={cn(
+                "fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 shadow-lg lg:shadow-none",
+                !sidebarOpen && "hidden lg:block"
+              )}
+            >
               <div className="flex flex-col h-full">
                 <div className="flex items-center gap-2 px-6 h-16 border-b border-gray-200">
                   <ShieldCheck className="w-6 h-6 text-emerald-600" />
@@ -147,7 +144,9 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
                   </Link>
                 </div>
               </div>
-        </aside>
+            </motion.aside>
+          )}
+        </AnimatePresence>
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto bg-gray-50 w-full">
