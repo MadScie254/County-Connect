@@ -24,6 +24,7 @@ import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
+import { getSelectedCounty } from "@/lib/counties";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -33,6 +34,7 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children, role }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const selectedCounty = getSelectedCounty();
 
   const citizenLinks = [
     { name: "Main Modules", type: "header" },
@@ -125,7 +127,7 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
                           {role === "admin" ? "Admin User" : "John Doe"}
                         </p>
                         <p className="text-xs text-gray-500 truncate">
-                          {role === "admin" ? "admin@county.go.ke" : "john@example.com"}
+                          {role === "admin" ? `admin@${selectedCounty.slug}.go.ke` : "john@example.com"}
                         </p>
                       </div>
                     </div>
@@ -190,8 +192,11 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
           <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-10">
             <div className="flex items-center gap-4">
               <h1 className="text-lg font-semibold text-gray-900 hidden sm:block">
-                {role === "admin" ? "Nairobi City County" : "Service Portal"}
+                {role === "admin" ? selectedCounty.name : `${selectedCounty.name} Service Portal`}
               </h1>
+              <span className="hidden lg:inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700">
+                {selectedCounty.region} region
+              </span>
             </div>
             <div className="flex items-center gap-4">
               <div className="relative hidden sm:block">

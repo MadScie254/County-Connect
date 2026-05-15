@@ -1,22 +1,32 @@
-import { ShieldCheck, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+import { ShieldCheck, Mail, Lock, ArrowRight, Loader2, Building2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, type FormEvent } from "react";
+import {
+  COUNTY_PROFILES,
+  getCountyBySlug,
+  getDefaultCounty,
+  getSelectedCountySlug,
+  setSelectedCounty,
+} from "@/lib/counties";
 
 export default function Login() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [role, setRole] = useState<"citizen" | "admin">("citizen");
+  const [countySlug, setCountySlug] = useState(getSelectedCountySlug());
+  const selectedCounty = getCountyBySlug(countySlug) ?? getDefaultCounty();
 
   const handleLogin = (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setSelectedCounty(selectedCounty.slug);
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
       if (role === "admin") {
-        navigate("/admin");
+        navigate(`/admin?county=${selectedCounty.slug}`);
       } else {
-        navigate("/dashboard");
+        navigate(`/dashboard?county=${selectedCounty.slug}`);
       }
     }, 1500);
   };
@@ -65,6 +75,37 @@ export default function Login() {
                 Government
               </button>
             </div>
+          </div>
+
+          <div className="mb-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+            <label htmlFor="county" className="block text-sm font-medium text-emerald-900 mb-2">
+              Select county login
+            </label>
+            <div className="relative">
+              <Building2 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-emerald-600" />
+              <select
+                id="county"
+                name="county"
+                value={countySlug}
+                onChange={(e) => setCountySlug(e.target.value)}
+                className="w-full rounded-xl border border-emerald-200 bg-white py-3 pl-10 pr-4 text-sm font-medium text-gray-900 shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+              >
+                {COUNTY_PROFILES.map((county) => (
+                  <option key={county.slug} value={county.slug}>
+                    {county.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-emerald-800">
+              This selects the county portal, county-specific support desk, and the pricing profile tied to your session.
+            </p>
+          </div>
+
+          <div className="mb-6 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-400">Current county</p>
+            <p className="mt-1 text-lg font-bold text-gray-900">{selectedCounty.name}</p>
+            <p className="text-sm text-gray-500">{selectedCounty.region} region · {selectedCounty.tier} tier</p>
           </div>
 
           <form className="space-y-6" onSubmit={handleLogin}>

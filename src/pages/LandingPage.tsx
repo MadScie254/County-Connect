@@ -1,8 +1,22 @@
+import { useState } from "react";
 import { ArrowRight, CheckCircle2, ShieldCheck, Building2, FileText, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
+import {
+  COUNTY_PROFILES,
+  formatCurrency,
+  getCountyBySlug,
+  getCountyPackages,
+  getDefaultCounty,
+  getSelectedCountySlug,
+  setSelectedCounty,
+} from "@/lib/counties";
 
 export default function LandingPage() {
+  const [selectedCountySlug, setSelectedCountySlug] = useState(getSelectedCountySlug());
+  const selectedCounty = getCountyBySlug(selectedCountySlug) ?? getDefaultCounty();
+  const selectedCountyPackages = getCountyPackages(selectedCounty);
+
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900">
       {/* Navigation */}
@@ -19,6 +33,7 @@ export default function LandingPage() {
             </div>
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900">Features</a>
+              <a href="#pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900">Pricing</a>
               <a href="#services" className="text-sm font-medium text-gray-600 hover:text-gray-900">Services</a>
               <a href="#about" className="text-sm font-medium text-gray-600 hover:text-gray-900">About</a>
             </div>
@@ -146,6 +161,138 @@ export default function LandingPage() {
                 <div className="text-emerald-200 text-sm font-medium uppercase tracking-wider">{stat.label}</div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* County Pricing Section */}
+      <section id="pricing" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 items-start">
+            <div>
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 mb-5 border border-blue-100">
+                County-specific pricing
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                Pricing that matches each county's scale and rollout reality.
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl leading-relaxed">
+                Choose a county to preview the launch package, then compare every county side by side.
+                The pricing table is built for procurement conversations, white-label rollouts, and county-by-county procurement cycles.
+              </p>
+
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 sm:items-center">
+                <label className="flex-1">
+                  <span className="block text-sm font-medium text-gray-700 mb-2">Preview county</span>
+                  <select
+                    value={selectedCountySlug}
+                    onChange={(e) => {
+                      setSelectedCountySlug(e.target.value);
+                      setSelectedCounty(e.target.value);
+                    }}
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                  >
+                    {COUNTY_PROFILES.map((county) => (
+                      <option key={county.slug} value={county.slug}>
+                        {county.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-5 py-4 text-sm text-emerald-900 shadow-sm sm:min-w-64">
+                  <p className="font-semibold uppercase tracking-[0.2em] text-[10px] text-emerald-700 mb-1">Selected county</p>
+                  <p className="text-lg font-bold leading-tight">{selectedCounty.name}</p>
+                  <p className="text-emerald-700 mt-1">{selectedCounty.region} region · {selectedCounty.tier} tier</p>
+                </div>
+              </div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45 }}
+              className="rounded-[2rem] border border-gray-200 bg-gray-950 text-white p-8 shadow-2xl shadow-gray-900/10"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-gray-400">Featured county package</p>
+              <h3 className="mt-3 text-2xl font-black tracking-tight">{selectedCounty.name}</h3>
+              <p className="mt-2 text-sm text-gray-300 leading-relaxed">{selectedCounty.launchNote}</p>
+
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  { label: "Starter", value: formatCurrency(selectedCountyPackages.starter) },
+                  { label: "Standard", value: formatCurrency(selectedCountyPackages.standard) },
+                  { label: "Enterprise", value: formatCurrency(selectedCountyPackages.enterprise) },
+                ].map((price) => (
+                  <div key={price.label} className="rounded-2xl bg-white/5 border border-white/10 p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-400">{price.label}</p>
+                    <p className="mt-2 text-lg font-black">{price.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 rounded-2xl bg-white/5 border border-white/10 p-4 text-sm text-gray-300 leading-relaxed">
+                Every county login is anchored to the selected county profile so the portal, support desk, and pricing all stay aligned.
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {COUNTY_PROFILES.map((county, idx) => {
+              const pricing = getCountyPackages(county);
+              const isActive = county.slug === selectedCounty.slug;
+
+              return (
+                <motion.article
+                  key={county.slug}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: idx * 0.01 }}
+                  className={`rounded-3xl border p-6 shadow-sm transition-all ${
+                    isActive
+                      ? "border-emerald-200 bg-emerald-50 shadow-emerald-100"
+                      : "border-gray-200 bg-white hover:shadow-md"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.22em] text-gray-400">{county.region}</p>
+                      <h3 className="mt-2 text-xl font-bold text-gray-900">{county.name}</h3>
+                    </div>
+                    <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
+                      isActive ? "bg-emerald-600 text-white" : "bg-gray-900 text-white"
+                    }`}>
+                      {county.tier}
+                    </span>
+                  </div>
+
+                  <p className="mt-4 text-sm text-gray-600 leading-relaxed">{county.launchNote}</p>
+
+                  <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+                    {[
+                      { label: "Starter", value: pricing.starter },
+                      { label: "Standard", value: pricing.standard },
+                      { label: "Enterprise", value: pricing.enterprise },
+                    ].map((price) => (
+                      <div key={price.label} className="rounded-2xl bg-gray-50 px-3 py-3 border border-gray-100">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">{price.label}</p>
+                        <p className="mt-1 text-sm font-black text-gray-900">{formatCurrency(price.value)}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedCountySlug(county.slug);
+                      setSelectedCounty(county.slug);
+                    }}
+                    className="mt-5 inline-flex items-center justify-center rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:border-emerald-300 hover:text-emerald-700"
+                  >
+                    Compare this county
+                  </button>
+                </motion.article>
+              );
+            })}
           </div>
         </div>
       </section>

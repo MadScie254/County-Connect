@@ -26,6 +26,7 @@ import {
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { getSelectedCounty } from "@/lib/counties";
 
 const revenueData = [
   { name: "Mon", amount: 2.1 },
@@ -38,6 +39,8 @@ const revenueData = [
 ];
 
 export default function AdminDashboard() {
+  const selectedCounty = getSelectedCounty();
+
   return (
     <DashboardLayout role="admin">
       <div className="space-y-8 pb-12">
@@ -47,7 +50,7 @@ export default function AdminDashboard() {
                 <Zap className="w-6 h-6" />
              </div>
              <div>
-                <h2 className="text-3xl font-black text-gray-900 tracking-tight italic uppercase">Nairobi City County</h2>
+               <h2 className="text-3xl font-black text-gray-900 tracking-tight italic uppercase">{selectedCounty.name}</h2>
                 <p className="text-gray-500 font-medium leading-none">Command Center Dashboard (Executive Access)</p>
              </div>
           </div>

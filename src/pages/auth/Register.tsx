@@ -1,18 +1,28 @@
-import { ShieldCheck, Mail, Lock, User, ArrowRight, Loader2, Phone } from "lucide-react";
+import { ShieldCheck, Mail, Lock, User, ArrowRight, Loader2, Phone, Building2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, type FormEvent } from "react";
+import {
+  COUNTY_PROFILES,
+  getCountyBySlug,
+  getDefaultCounty,
+  getSelectedCountySlug,
+  setSelectedCounty,
+} from "@/lib/counties";
 
 export default function Register() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [countySlug, setCountySlug] = useState(getSelectedCountySlug());
+  const selectedCounty = getCountyBySlug(countySlug) ?? getDefaultCounty();
 
   const handleRegister = (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setSelectedCounty(selectedCounty.slug);
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      navigate("/dashboard");
+      navigate(`/dashboard?county=${selectedCounty.slug}`);
     }, 1500);
   };
 
@@ -37,6 +47,37 @@ export default function Register() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-200">
+          <div className="mb-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+            <label htmlFor="register-county" className="block text-sm font-medium text-emerald-900 mb-2">
+              County account
+            </label>
+            <div className="relative">
+              <Building2 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-emerald-600" />
+              <select
+                id="register-county"
+                name="register-county"
+                value={countySlug}
+                onChange={(e) => setCountySlug(e.target.value)}
+                className="w-full rounded-xl border border-emerald-200 bg-white py-3 pl-10 pr-4 text-sm font-medium text-gray-900 shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+              >
+                {COUNTY_PROFILES.map((county) => (
+                  <option key={county.slug} value={county.slug}>
+                    {county.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-emerald-800">
+              New accounts inherit the chosen county profile for onboarding, pricing, and support routing.
+            </p>
+          </div>
+
+          <div className="mb-6 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-400">Selected county</p>
+            <p className="mt-1 text-lg font-bold text-gray-900">{selectedCounty.name}</p>
+            <p className="text-sm text-gray-500">{selectedCounty.region} region · {selectedCounty.tier} tier</p>
+          </div>
+
           <form className="space-y-6" onSubmit={handleRegister}>
             <div className="grid grid-cols-2 gap-4">
               <div>
