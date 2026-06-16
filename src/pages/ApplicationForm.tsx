@@ -18,6 +18,7 @@ export default function ApplicationForm() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"mpesa" | "card">("mpesa");
 
   const handleNext = () => {
     if (currentStep < steps.length) {
@@ -199,24 +200,24 @@ export default function ApplicationForm() {
                   <p className="text-3xl font-bold text-gray-900 mb-8">KES 15,000</p>
                   
                   <div className="space-y-4">
-                    <button className="w-full flex items-center justify-between px-4 py-3 border border-emerald-500 bg-emerald-50 text-emerald-700 rounded-lg font-medium">
+                    <button type="button" onClick={() => setPaymentMethod("mpesa")} className="w-full flex items-center justify-between px-4 py-3 border border-emerald-500 bg-emerald-50 text-emerald-700 rounded-lg font-medium">
                       <span className="flex items-center gap-2">
                         <CreditCard className="w-5 h-5" />
                         M-Pesa
                       </span>
-                      <span className="w-4 h-4 rounded-full border-2 border-emerald-600 bg-emerald-600"></span>
+                      <span className={`w-4 h-4 rounded-full border-2 ${paymentMethod === "mpesa" ? "border-emerald-600 bg-emerald-600" : "border-gray-300"}`}></span>
                     </button>
-                    <button className="w-full flex items-center justify-between px-4 py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg font-medium transition-colors">
+                    <button type="button" onClick={() => setPaymentMethod("card")} className="w-full flex items-center justify-between px-4 py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg font-medium transition-colors">
                       <span className="flex items-center gap-2">
                         <CreditCard className="w-5 h-5" />
                         Credit/Debit Card
                       </span>
-                      <span className="w-4 h-4 rounded-full border-2 border-gray-300"></span>
+                      <span className={`w-4 h-4 rounded-full border-2 ${paymentMethod === "card" ? "border-emerald-600 bg-emerald-600" : "border-gray-300"}`}></span>
                     </button>
                   </div>
 
                   <div className="mt-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2 text-left">M-Pesa Phone Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 text-left">{paymentMethod === "mpesa" ? "M-Pesa Phone Number" : "Card Billing Contact"}</label>
                     <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="07XX XXX XXX" defaultValue="0712 345 678" />
                   </div>
                 </div>
