@@ -158,7 +158,7 @@ export default function ApiHub() {
                  </div>
               </div>
 
-              <button type="button" id="api-docs" onClick={() => document.getElementById("api-docs")?.scrollIntoView({ behavior: "smooth" })} className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm relative overflow-hidden flex items-center justify-between cursor-pointer group text-left">
+              <button type="button" onClick={() => { window.location.href = "mailto:developers@countyconnect.go.ke?subject=CountyConnect%20API%20Documentation"; }} className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm relative overflow-hidden flex items-center justify-between cursor-pointer group text-left">
                   <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-600"></div>
                   <div>
                      <h4 className="font-black text-gray-900 italic mb-1 uppercase tracking-tighter">Developer Documentation</h4>

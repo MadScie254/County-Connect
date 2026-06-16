@@ -137,7 +137,7 @@ export default function ServiceCatalog() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-3 bg-transparent border-none focus:ring-0 text-gray-900 placeholder-gray-400 font-medium"
             />
-            <button className="hidden sm:block bg-emerald-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
+            <button type="button" onClick={() => document.getElementById("services-grid")?.scrollIntoView({ behavior: "smooth" })} className="hidden sm:block bg-emerald-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
               Search
             </button>
           </div>
@@ -163,7 +163,7 @@ export default function ServiceCatalog() {
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div id="services-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredServices.map((service, idx) => (
             <motion.div
               key={service.id}

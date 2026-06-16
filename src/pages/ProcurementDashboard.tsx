@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { Search, Filter, AlertTriangle, CheckCircle2, Building2, FileText, TrendingUp } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { useState } from "react";
 
 const tenders = [
   { id: "TND-2024-001", title: "Construction of Market Stalls", entity: "Nairobi County", value: 45000000, status: "Open", deadline: "2024-03-15" },
@@ -32,6 +33,30 @@ const awardDistribution = [
 const COLORS = ['#059669', '#3b82f6', '#f59e0b', '#9ca3af'];
 
 export default function ProcurementDashboard() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [openOnly, setOpenOnly] = useState(false);
+
+  const filteredTenders = tenders.filter((tender) => {
+    const matchesSearch = [tender.id, tender.title, tender.entity].join(" ").toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = !openOnly || tender.status === "Open";
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleSearch = () => {
+    const nextSearch = window.prompt("Search tenders, entities, or IDs", searchTerm) ?? searchTerm;
+    setSearchTerm(nextSearch);
+  };
+
+  const handleFilter = () => {
+    setOpenOnly((current) => !current);
+  };
+
+  const handleInvestigationDetails = () => {
+    setSearchTerm("Mega Corp Ltd");
+    setOpenOnly(false);
+  };
+
   return (
     <DashboardLayout role="admin">
       <div className="space-y-8">
@@ -90,8 +115,8 @@ export default function ProcurementDashboard() {
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <h3 className="font-semibold text-gray-900">Recent Tenders</h3>
               <div className="flex gap-2">
-                <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-500"><Search className="w-4 h-4" /></button>
-                <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-500"><Filter className="w-4 h-4" /></button>
+                <button type="button" onClick={handleSearch} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500" aria-label="Search tenders"><Search className="w-4 h-4" /></button>
+                <button type="button" onClick={handleFilter} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500" aria-label="Toggle open tenders filter"><Filter className="w-4 h-4" /></button>
               </div>
             </div>
             <div className="overflow-x-auto">
@@ -106,7 +131,7 @@ export default function ProcurementDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {tenders.map((tender) => (
+                  {filteredTenders.map((tender) => (
                     <tr key={tender.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-medium text-gray-900">{tender.id}</td>
                       <td className="px-6 py-4 text-gray-600">{tender.title}</td>
@@ -173,7 +198,7 @@ export default function ProcurementDashboard() {
                   <p className="text-red-700 text-xs mt-1">
                     "Mega Corp Ltd" has won 90% of road maintenance tenders in County X over the last 6 months.
                   </p>
-                  <button className="mt-2 text-xs font-medium text-red-800 hover:underline">View Investigation Details</button>
+                  <button type="button" onClick={handleInvestigationDetails} className="mt-2 text-xs font-medium text-red-800 hover:underline">View Investigation Details</button>
                 </div>
               </div>
             </div>

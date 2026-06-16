@@ -17,9 +17,23 @@ import { motion } from "motion/react";
 export default function TaxCompliance() {
   const [revenue, setRevenue] = useState("0");
   const [expenses, setExpenses] = useState("0");
+   const [showAllRecords, setShowAllRecords] = useState(false);
+   const [actionMessage, setActionMessage] = useState("");
 
   const taxableIncome = Math.max(0, parseFloat(revenue || "0") - parseFloat(expenses || "0"));
   const estimatedTax = taxableIncome * 0.15; // Mock 15% rate
+
+   const handlePay = () => {
+      setActionMessage("M-PESA payment request sent. Check your phone for the push prompt.");
+   };
+
+   const handleConfigureBridge = () => {
+      setActionMessage("Opening the tax bridge support workflow for county configuration.");
+   };
+
+   const handleToggleRecords = () => {
+      setShowAllRecords((current) => !current);
+   };
 
   return (
     <DashboardLayout role="citizen">
@@ -118,10 +132,11 @@ export default function TaxCompliance() {
                        <span className="text-sm font-black text-gray-900 uppercase">Estimated Tax Due:</span>
                        <span className="text-2xl font-black text-blue-600 underline">KES {estimatedTax.toLocaleString()}</span>
                     </div>
-                    <button className="w-full mt-6 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-200">
+                    <button type="button" onClick={handlePay} className="w-full mt-6 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-200">
                        <Smartphone className="w-4 h-4" /> Pay via M-PESA Push
                     </button>
                     <p className="mt-3 text-[10px] text-center text-gray-400 font-bold uppercase tracking-widest italic">Direct reconciliation with KRA Ledger</p>
+                    {actionMessage && <p className="mt-3 text-xs font-bold text-emerald-600">{actionMessage}</p>}
                  </div>
                </div>
             </div>
@@ -135,10 +150,11 @@ export default function TaxCompliance() {
                     <h3 className="text-2xl font-black mb-1 tracking-tighter italic uppercase">Automated KRA Reporting</h3>
                     <p className="text-blue-100/70 text-sm font-medium">Connect your sales ledger and let CountyConnect build your iTax returns.</p>
                   </div>
-                  <button className="px-8 py-3 bg-white text-blue-900 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-emerald-400 hover:text-black transition transform active:scale-95 shadow-xl">
+                  <button type="button" onClick={handleConfigureBridge} className="px-8 py-3 bg-white text-blue-900 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-emerald-400 hover:text-black transition transform active:scale-95 shadow-xl">
                     Configure Bridge
                   </button>
                </div>
+               {actionMessage && <p className="relative z-10 mt-4 text-xs font-bold text-blue-100/80">{actionMessage}</p>}
             </div>
           </div>
 
@@ -170,8 +186,13 @@ export default function TaxCompliance() {
                   ))}
                </div>
                <div className="p-4 bg-gray-50 border-t border-gray-100">
-                  <button className="w-full text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-gray-900 transition">View All Records</button>
+                           <button type="button" onClick={handleToggleRecords} className="w-full text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-gray-900 transition">{showAllRecords ? "Show Recent Only" : "View All Records"}</button>
                </div>
+                      {showAllRecords && (
+                         <div className="px-4 pb-4 text-xs text-gray-500">
+                            Archived records are now expanded for audit review and export.
+                         </div>
+                      )}
             </div>
 
             <div className="bg-white rounded-3xl border border-gray-200 p-6 flex flex-col items-center text-center shadow-sm">

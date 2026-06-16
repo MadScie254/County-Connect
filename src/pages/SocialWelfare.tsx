@@ -1,8 +1,24 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Users, Heart, Wallet, CheckCircle2, Clock, MapPin, Search } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 
 export default function SocialWelfare() {
+  const [statusMessage, setStatusMessage] = useState("");
+  const [showOffices, setShowOffices] = useState(false);
+
+  const handleEligibilityCheck = () => {
+    setStatusMessage("Eligibility pre-check started. Your household profile is being matched.");
+  };
+
+  const handleScheduleSync = () => {
+    setStatusMessage("Biometric sync scheduled for your nearest welfare office.");
+  };
+
+  const handleViewOffices = () => {
+    setShowOffices((current) => !current);
+  };
+
   return (
     <DashboardLayout role="citizen">
       <div className="space-y-8">
@@ -11,7 +27,7 @@ export default function SocialWelfare() {
             <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Social Welfare Portal</h2>
             <p className="text-gray-500">Beneficiary management and disbursement portal for vulnerable households.</p>
           </div>
-          <button className="px-6 py-2 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-100 flex items-center gap-2">
+          <button type="button" onClick={handleEligibilityCheck} className="px-6 py-2 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-100 flex items-center gap-2">
             <Users className="w-4 h-4" />
             Check Eligibility
           </button>
@@ -103,9 +119,16 @@ export default function SocialWelfare() {
               Integrated with Huduma Namba system.
             </p>
             <div className="flex gap-4">
-              <button className="px-6 py-2 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition">Schedule Sync</button>
-              <button className="px-6 py-2 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition">View Offices</button>
+              <button type="button" onClick={handleScheduleSync} className="px-6 py-2 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition">Schedule Sync</button>
+              <button type="button" onClick={handleViewOffices} className="px-6 py-2 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition">{showOffices ? "Hide Offices" : "View Offices"}</button>
             </div>
+            {statusMessage && <p className="mt-4 text-xs font-bold text-emerald-200">{statusMessage}</p>}
+            {showOffices && (
+              <div className="mt-4 rounded-2xl bg-white/10 border border-white/10 p-4 text-xs text-emerald-100">
+                <p className="font-bold uppercase tracking-widest mb-2">Nearest offices</p>
+                <p>Westlands Sub-County Office, City Hall Welfare Desk, and Kasarani Satellite Office are available for biometric sync.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
