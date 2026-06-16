@@ -28,7 +28,7 @@ export default function LandingPage() {
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <span className="font-bold text-xl tracking-tight text-gray-900">
-                CountyConnect
+                County Connect
               </span>
             </div>
             <div className="hidden md:flex items-center gap-8">
@@ -106,7 +106,7 @@ export default function LandingPage() {
       <section id="features" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why CountyConnect?</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why County Connect?</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               We bridge the gap between citizens and county governments with a secure, transparent, and efficient digital platform.
             </p>
@@ -304,7 +304,7 @@ export default function LandingPage() {
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Empowering Counties, Serving Citizens</h2>
               <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                CountyConnect is built to solve the unique challenges of devolved governance. 
+                County Connect is built to solve the unique challenges of devolved governance. 
                 We provide a unified digital infrastructure that eliminates paperwork, 
                 reduces leakages, and ensures every shilling of revenue is accounted for.
               </p>
@@ -351,7 +351,7 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-            <p className="text-gray-600">Common questions about using CountyConnect.</p>
+            <p className="text-gray-600">Common questions about using County Connect.</p>
           </div>
           
           <div className="space-y-4">
@@ -375,10 +375,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-6 h-6 text-emerald-500" />
-            <span className="font-bold text-white text-lg">CountyConnect</span>
+            <span className="font-bold text-white text-lg">County Connect</span>
           </div>
           <div className="text-sm">
-            &copy; {new Date().getFullYear()} CountyConnect SaaS. All rights reserved.
+            &copy; {new Date().getFullYear()} County Connect SaaS. All rights reserved.
           </div>
         </div>
       </footer>

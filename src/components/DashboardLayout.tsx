@@ -27,6 +27,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { getSelectedCounty } from "@/lib/counties";
 import { CURRENT_CITIZEN } from "@/lib/profile";
 import { logout } from "@/lib/auth";
+import { getUnreadCount } from "@/lib/store";
 
 interface DashboardLayoutProps {
   children: ReactNode;
