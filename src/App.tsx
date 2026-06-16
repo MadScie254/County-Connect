@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
 import LandingPage from "@/pages/LandingPage";
 import CitizenDashboard from "@/pages/CitizenDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
@@ -22,8 +23,14 @@ import RevenueCollection from "@/pages/RevenueCollection";
 import ApiHub from "@/pages/ApiHub";
 import ExecutiveAnalytics from "@/pages/ExecutiveAnalytics";
 import PublicHealth from "@/pages/PublicHealth";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { initializeStore } from "@/lib/store";
 
 export default function App() {
+  useEffect(() => {
+    initializeStore();
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -32,33 +39,34 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         
         {/* Citizen Routes */}
-        <Route path="/dashboard" element={<CitizenDashboard />} />
-        <Route path="/applications/new" element={<ServiceCatalog />} />
-        <Route path="/apply/:serviceId" element={<ApplicationForm />} />
-        <Route path="/tax-compliance" element={<TaxCompliance />} />
-        <Route path="/land-registry" element={<LandRegistry />} />
-        <Route path="/social-welfare" element={<SocialWelfare />} />
-        <Route path="/engagement" element={<CitizenEngagement />} />
-        <Route path="/profile" element={<UserProfile />} />
-        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/dashboard" element={<ProtectedRoute role="citizen"><CitizenDashboard /></ProtectedRoute>} />
+        <Route path="/applications/new" element={<ProtectedRoute role="citizen"><ServiceCatalog /></ProtectedRoute>} />
+        <Route path="/apply/:serviceId" element={<ProtectedRoute role="citizen"><ApplicationForm /></ProtectedRoute>} />
+        <Route path="/tax-compliance" element={<ProtectedRoute role="citizen"><TaxCompliance /></ProtectedRoute>} />
+        <Route path="/land-registry" element={<ProtectedRoute role="citizen"><LandRegistry /></ProtectedRoute>} />
+        <Route path="/social-welfare" element={<ProtectedRoute role="citizen"><SocialWelfare /></ProtectedRoute>} />
+        <Route path="/engagement" element={<ProtectedRoute role="citizen"><CitizenEngagement /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute role="citizen"><UserProfile /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute role="citizen"><Notifications /></ProtectedRoute>} />
 
         {/* Admin Routes */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/analytics" element={<ExecutiveAnalytics />} />
-        <Route path="/admin/applications" element={<ApplicationsList />} />
-        <Route path="/admin/applications/:id" element={<ApplicationReview />} />
-        <Route path="/admin/services" element={<AdminServices />} />
-        <Route path="/admin/departments" element={<AdminDepartments />} />
-        <Route path="/admin/settings" element={<AdminSettings />} />
-        <Route path="/admin/procurement" element={<ProcurementDashboard />} />
-        <Route path="/admin/revenue" element={<RevenueCollection />} />
-        <Route path="/admin/welfare" element={<SocialWelfare />} />
-        <Route path="/admin/health" element={<PublicHealth />} />
-        <Route path="/admin/api-hub" element={<ApiHub />} />
+        <Route path="/admin" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin/analytics" element={<ProtectedRoute role="admin"><ExecutiveAnalytics /></ProtectedRoute>} />
+        <Route path="/admin/applications" element={<ProtectedRoute role="admin"><ApplicationsList /></ProtectedRoute>} />
+        <Route path="/admin/applications/:id" element={<ProtectedRoute role="admin"><ApplicationReview /></ProtectedRoute>} />
+        <Route path="/admin/services" element={<ProtectedRoute role="admin"><AdminServices /></ProtectedRoute>} />
+        <Route path="/admin/departments" element={<ProtectedRoute role="admin"><AdminDepartments /></ProtectedRoute>} />
+        <Route path="/admin/settings" element={<ProtectedRoute role="admin"><AdminSettings /></ProtectedRoute>} />
+        <Route path="/admin/procurement" element={<ProtectedRoute role="admin"><ProcurementDashboard /></ProtectedRoute>} />
+        <Route path="/admin/revenue" element={<ProtectedRoute role="admin"><RevenueCollection /></ProtectedRoute>} />
+        <Route path="/admin/welfare" element={<ProtectedRoute role="admin"><SocialWelfare /></ProtectedRoute>} />
+        <Route path="/admin/health" element={<ProtectedRoute role="admin"><PublicHealth /></ProtectedRoute>} />
+        <Route path="/admin/api-hub" element={<ProtectedRoute role="admin"><ApiHub /></ProtectedRoute>} />
 
         {/* Redirects/Fallbacks */}
         <Route path="/applications" element={<Navigate to="/dashboard" />} />
         <Route path="/payments" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
