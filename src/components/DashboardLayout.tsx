@@ -87,7 +87,7 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 rounded-md hover:bg-gray-100"
           aria-label={sidebarOpen ? "Close menu" : "Open menu"}
-          aria-expanded={sidebarOpen ? "true" : "false"}
+          title={sidebarOpen ? "Close menu" : "Open menu"}
         >
           {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>

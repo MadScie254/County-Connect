@@ -1,7 +1,7 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { User, Mail, Phone, MapPin, Save, Camera } from "lucide-react";
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
-import { CURRENT_CITIZEN } from "@/lib/profile";
+import { CURRENT_CITIZEN, type CitizenProfile } from "@/lib/profile";
 
 export default function UserProfile() {
   const fileInputRef = useRef<HTMLInputElement>(null);

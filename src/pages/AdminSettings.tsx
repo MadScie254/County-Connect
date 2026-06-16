@@ -80,7 +80,7 @@ export default function AdminSettings() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="county-name" className="block text-sm font-medium text-gray-700 mb-1">County Name</label>
-                  <input type="text" value={settings.countyName} onChange={(event) => setSettings((current) => ({ ...current, countyName: event.target.value }))} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500" />
+                  <input id="county-name" type="text" value={settings.countyName} onChange={(event) => setSettings((current: CountySettings) => ({ ...current, countyName: event.target.value }))} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500" title="County name" placeholder="Nairobi City County" />
                 </div>
                 <div>
                   <label htmlFor="support-email" className="block text-sm font-medium text-gray-700 mb-1">Support Email</label>
@@ -119,11 +119,11 @@ export default function AdminSettings() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Notifications</h3>
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" id="email-notif" className="rounded text-emerald-600 focus:ring-emerald-500" checked={settings.emailNotifications} onChange={(event) => setSettings((current) => ({ ...current, emailNotifications: event.target.checked }))} />
+                    <input type="checkbox" id="email-notif" className="rounded text-emerald-600 focus:ring-emerald-500" checked={settings.emailNotifications} onChange={(event) => setSettings((current: CountySettings) => ({ ...current, emailNotifications: event.target.checked }))} title="Enable email notifications" aria-label="Enable email notifications" />
                   <label htmlFor="email-notif" className="text-sm text-gray-700">Send email notifications for application updates</label>
                 </div>
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" id="sms-notif" className="rounded text-emerald-600 focus:ring-emerald-500" checked={settings.smsNotifications} onChange={(event) => setSettings((current) => ({ ...current, smsNotifications: event.target.checked }))} />
+                    <input type="checkbox" id="sms-notif" className="rounded text-emerald-600 focus:ring-emerald-500" checked={settings.smsNotifications} onChange={(event) => setSettings((current: CountySettings) => ({ ...current, smsNotifications: event.target.checked }))} title="Enable SMS notifications" aria-label="Enable SMS notifications" />
                   <label htmlFor="sms-notif" className="text-sm text-gray-700">Send SMS alerts for payment confirmations</label>
                 </div>
               </div>

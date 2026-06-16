@@ -83,6 +83,7 @@ export default function ApplicationReview() {
             type="button"
             onClick={() => navigate("/admin")}
             aria-label="Back to applications list"
+            title="Back to applications list"
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
             <span className="sr-only">Back to applications list</span>
