@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "motion/react";
+import { addRevenueEntry } from "@/lib/store";
+import { CURRENT_CITIZEN } from "@/lib/profile";
 
 export default function TaxCompliance() {
   const [revenue, setRevenue] = useState("0");
@@ -24,7 +26,19 @@ export default function TaxCompliance() {
   const estimatedTax = taxableIncome * 0.15; // Mock 15% rate
 
    const handlePay = () => {
-      setActionMessage("M-PESA payment request sent. Check your phone for the push prompt.");
+      if (estimatedTax <= 0) {
+        setActionMessage("No tax due.");
+        return;
+      }
+      addRevenueEntry({
+        ref: `TX${Date.now().toString().slice(-6)}`,
+        amount: estimatedTax,
+        user: CURRENT_CITIZEN.fullName,
+        stream: "SME Tax Payment",
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        reconciled: false,
+      });
+      setActionMessage(`M-PESA payment request for KES ${estimatedTax.toLocaleString()} sent. Check your phone for the push prompt.`);
    };
 
    const handleConfigureBridge = () => {
