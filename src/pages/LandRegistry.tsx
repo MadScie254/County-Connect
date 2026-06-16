@@ -15,12 +15,14 @@ import {
 import { useState } from "react";
 import { motion } from "motion/react";
 import { CURRENT_CITIZEN } from "@/lib/profile";
+import { getLandRecords } from "@/lib/store";
 
 export default function LandRegistry() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState<null | { owner: string; status: string; confidence: string; lastTransfer: string }>(null);
+  const landRecords = getLandRecords();
 
   const handleSearch = () => {
     if (!searchQuery.trim()) {
@@ -192,12 +194,8 @@ export default function LandRegistry() {
                   <span className="text-[10px] font-mono bg-emerald-500 text-black px-2 py-1 rounded">LIVE LEDGER</span>
                 </div>
                 <div className="space-y-4">
-                  {[
-                    { action: "Block 0xF821 Validation", detail: "Parcel NAI/B112 verified via NLIMS bridge", status: "Success", hash: "0x82...a1f" },
-                    { action: "Ownership Transfer", detail: `Asset 209/45 moved to ${CURRENT_CITIZEN.fullName}`, status: "Immutable", hash: "0x3e...b42" },
-                    { action: "Anomaly Flagged", detail: "Suspicious transfer pattern on Plot 14", status: "Investigating", hash: "0x91...c99" },
-                  ].map((item, idx) => (
-                    <div key={idx} className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-center justify-between hover:bg-white/10 transition">
+                  {landRecords.map((item, idx) => (
+                    <div key={item.id} className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-center justify-between hover:bg-white/10 transition">
                       <div className="flex items-center gap-4">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                         <div>
@@ -222,7 +220,7 @@ export default function LandRegistry() {
               <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
                 <Map className="w-10 h-10" />
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight italic">3D GIS GEOSPATIAL ENGINEv</h3>
+              <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight italic">3D GIS GEOSPATIAL ENGINE</h3>
               <p className="text-gray-600 mb-8 leading-relaxed font-medium">
                 Real-time parcel visualization, zoning overlays, and public utilities mapping. 
                 County Connect GIS integrates directly with sub-county survey data.
