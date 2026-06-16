@@ -212,7 +212,9 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
               </div>
               <Link to="/notifications" className="relative p-2 text-gray-400 hover:text-gray-500" aria-label="Notifications">
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                {getUnreadCount() > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                )}
               </Link>
             </div>
           </header>
