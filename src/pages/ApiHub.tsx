@@ -1,8 +1,23 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Database, Zap, ShieldCheck, Activity, Terminal, Key, Search, ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 
 export default function ApiHub() {
+   const [apiKey, setApiKey] = useState("sk_live_51P2u...9xJ31l");
+   const [copyMessage, setCopyMessage] = useState("");
+
+   const handleCopy = async (text: string, label: string) => {
+      await navigator.clipboard.writeText(text);
+      setCopyMessage(`${label} copied to clipboard.`);
+   };
+
+   const regenerateKey = () => {
+      const nextKey = `sk_live_${Math.random().toString(36).slice(2, 8)}...${Math.random().toString(36).slice(2, 7)}`;
+      setApiKey(nextKey);
+      setCopyMessage("Production API key regenerated for the current county session.");
+   };
+
   return (
     <DashboardLayout role="admin">
       <div className="space-y-8">
@@ -103,7 +118,7 @@ export default function ApiHub() {
                                 </div>
                              </td>
                              <td className="px-8 py-5 text-right">
-                                <button className="p-2 hover:bg-white rounded-lg text-gray-400 hover:text-emerald-600 transition shadow-none hover:shadow-sm">
+                                <button type="button" onClick={() => handleCopy(`/api/v1/bridge/${api.url}`, api.name)} className="p-2 hover:bg-white rounded-lg text-gray-400 hover:text-emerald-600 transition shadow-none hover:shadow-sm" aria-label={`Copy ${api.name} endpoint`}>
                                    <ArrowRight className="w-4 h-4" />
                                 </button>
                              </td>
@@ -128,21 +143,22 @@ export default function ApiHub() {
                     <div className="p-4 bg-white/5 border border-white/10 rounded-2xl mb-6">
                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Production API Key</p>
                        <div className="flex items-center justify-between">
-                          <p className="font-mono text-xs text-emerald-400 truncate pr-4">sk_live_51P2u...9xJ31l</p>
-                          <button className="text-[10px] font-bold text-white/50 hover:text-white uppercase transition">Copy</button>
+                          <p className="font-mono text-xs text-emerald-400 truncate pr-4">{apiKey}</p>
+                          <button type="button" onClick={() => handleCopy(apiKey, "Production API key")} className="text-[10px] font-bold text-white/50 hover:text-white uppercase transition">Copy</button>
                        </div>
                     </div>
                     <p className="text-xs text-gray-400 font-medium leading-relaxed mb-8">
                        Authorized partner banks and intermediaries access verified license data through this gateway. 
                        <span className="text-emerald-400"> Monetize every verification call.</span>
                     </p>
-                    <button className="w-full py-4 bg-emerald-500 text-black font-black rounded-2xl hover:bg-emerald-400 transition transform active:scale-95 shadow-xl shadow-emerald-500/20 uppercase tracking-[0.2em] text-xs">
+                    <button type="button" onClick={regenerateKey} className="w-full py-4 bg-emerald-500 text-black font-black rounded-2xl hover:bg-emerald-400 transition transform active:scale-95 shadow-xl shadow-emerald-500/20 uppercase tracking-[0.2em] text-xs">
                        Regenerate Credentials
                     </button>
+                    {copyMessage && <p className="mt-4 text-xs text-emerald-300">{copyMessage}</p>}
                  </div>
               </div>
 
-              <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm relative overflow-hidden flex items-center justify-between cursor-pointer group">
+              <button type="button" id="api-docs" onClick={() => document.getElementById("api-docs")?.scrollIntoView({ behavior: "smooth" })} className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm relative overflow-hidden flex items-center justify-between cursor-pointer group text-left">
                   <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-600"></div>
                   <div>
                      <h4 className="font-black text-gray-900 italic mb-1 uppercase tracking-tighter">Developer Documentation</h4>
@@ -151,7 +167,7 @@ export default function ApiHub() {
                   <div className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center text-gray-400 group-hover:bg-emerald-600 group-hover:text-white transition transform group-hover:rotate-45">
                      <ArrowRight className="w-5 h-5" />
                   </div>
-              </div>
+              </button>
            </div>
         </div>
       </div>

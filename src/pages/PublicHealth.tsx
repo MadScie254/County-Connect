@@ -1,8 +1,20 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { HeartPulse, FlaskConical, Stethoscope, ClipboardList, Package, TrendingUp, Search } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 
 export default function PublicHealth() {
+   const [restockMessage, setRestockMessage] = useState("");
+   const [dispatchMessage, setDispatchMessage] = useState("");
+
+   const handleRestockAll = () => {
+      setRestockMessage("Critical stock-out facilities have been queued for immediate replenishment.");
+   };
+
+   const handleDispatchReports = () => {
+      setDispatchMessage("MOH 105 reports dispatched to the county health office and archived locally.");
+   };
+
   return (
     <DashboardLayout role="admin">
       <div className="space-y-8">
@@ -66,7 +78,7 @@ export default function PublicHealth() {
                   <Package className="w-5 h-5 text-blue-600" />
                   Drug Stock Control Bridge
                 </h3>
-                <button className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline">Restock All</button>
+                        <button type="button" onClick={handleRestockAll} className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline">Restock All</button>
               </div>
               <div className="p-6">
                  <div className="space-y-4">
@@ -88,6 +100,7 @@ export default function PublicHealth() {
                       </div>
                    ))}
                  </div>
+                 {restockMessage && <p className="mt-4 text-xs font-bold text-emerald-600">{restockMessage}</p>}
               </div>
            </div>
 
@@ -114,9 +127,10 @@ export default function PublicHealth() {
                     </div>
                  </div>
               </div>
-              <button className="relative z-10 mt-8 py-4 bg-emerald-500 text-black font-black rounded-2xl hover:bg-emerald-400 transition transform active:scale-95 shadow-xl shadow-emerald-500/20 uppercase tracking-widest text-sm">
+              <button type="button" onClick={handleDispatchReports} className="relative z-10 mt-8 py-4 bg-emerald-500 text-black font-black rounded-2xl hover:bg-emerald-400 transition transform active:scale-95 shadow-xl shadow-emerald-500/20 uppercase tracking-widest text-sm">
                  Dispatch Reports to MOH
               </button>
+              {dispatchMessage && <p className="relative z-10 mt-4 text-xs font-bold text-emerald-200">{dispatchMessage}</p>}
            </div>
         </div>
       </div>

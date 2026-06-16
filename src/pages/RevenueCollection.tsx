@@ -1,8 +1,16 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Coins, Smartphone, TrendingUp, AlertCircle, BarChart3, Search, Filter } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 
 export default function RevenueCollection() {
+   const [advancedReconEnabled, setAdvancedReconEnabled] = useState(false);
+   const [treasuryMessage, setTreasuryMessage] = useState("");
+
+   const handleTreasuryPush = () => {
+      setTreasuryMessage("Revenue batch queued for IFMIS treasury sync and audit log export.");
+   };
+
   return (
     <DashboardLayout role="admin">
       <div className="space-y-8">
@@ -12,9 +20,9 @@ export default function RevenueCollection() {
             <p className="text-gray-500 italic mt-0.5">Real-time M-PESA reconciliation for parking, market fees, and levies.</p>
           </div>
           <div className="flex items-center gap-3">
-             <button className="px-6 py-2.5 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-100 flex items-center gap-2">
+             <button type="button" onClick={() => setAdvancedReconEnabled((current) => !current)} className="px-6 py-2.5 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-100 flex items-center gap-2">
                 <Filter className="w-4 h-4" />
-                Advanced Recon
+                {advancedReconEnabled ? "Recon Enabled" : "Advanced Recon"}
              </button>
           </div>
         </div>
@@ -135,9 +143,10 @@ export default function RevenueCollection() {
                  </div>
               </div>
               <div className="p-8 pt-0 mt-4">
-                 <button className="w-full py-4 bg-emerald-500 text-black font-black rounded-2xl hover:bg-emerald-400 transition shadow-xl shadow-emerald-500/20 uppercase tracking-widest text-sm italic">
+                 <button type="button" onClick={handleTreasuryPush} className="w-full py-4 bg-emerald-500 text-black font-black rounded-2xl hover:bg-emerald-400 transition shadow-xl shadow-emerald-500/20 uppercase tracking-widest text-sm italic">
                     Push To Treasury IFMIS
                  </button>
+                 {treasuryMessage && <p className="mt-4 text-xs font-bold text-emerald-300">{treasuryMessage}</p>}
               </div>
            </div>
         </div>

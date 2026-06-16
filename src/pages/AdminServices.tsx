@@ -1,7 +1,8 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Plus, Edit, Trash2, Search } from "lucide-react";
+import { useState } from "react";
 
-const services = [
+const initialServices = [
   { id: 1, name: "Single Business Permit", department: "Trade", fee: "Variable", status: "Active" },
   { id: 2, name: "Land Rates", department: "Lands", fee: "Variable", status: "Active" },
   { id: 3, name: "Parking", department: "Transport", fee: "Fixed", status: "Active" },
@@ -10,6 +11,61 @@ const services = [
 ];
 
 export default function AdminServices() {
+  const [services, setServices] = useState(initialServices);
+
+  const handleAddService = () => {
+    const serviceName = window.prompt("Service name", "County Service");
+
+    if (!serviceName) {
+      return;
+    }
+
+    const departmentName = window.prompt("Owning department", "General Administration") ?? "General Administration";
+
+    setServices((currentServices) => [
+      ...currentServices,
+      {
+        id: Date.now(),
+        name: serviceName,
+        department: departmentName,
+        fee: "Variable",
+        status: "Draft",
+      },
+    ]);
+  };
+
+  const handleEditService = (serviceId: number) => {
+    const currentService = services.find((service) => service.id === serviceId);
+
+    if (!currentService) {
+      return;
+    }
+
+    const updatedName = window.prompt("Update service name", currentService.name);
+
+    if (!updatedName) {
+      return;
+    }
+
+    setServices((currentServices) => currentServices.map((service) => service.id === serviceId ? { ...service, name: updatedName } : service));
+  };
+
+  const handleDeleteService = (serviceId: number) => {
+    const currentService = services.find((service) => service.id === serviceId);
+
+    if (!currentService) {
+      return;
+    }
+
+    const isConfirmed = window.confirm(`Remove ${currentService.name}?`);
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    setServices((currentServices) => currentServices.filter((service) => service.id !== serviceId));
+  };
+
   return (
     <DashboardLayout role="admin">
       <div className="space-y-6">
@@ -18,7 +74,7 @@ export default function AdminServices() {
             <h2 className="text-2xl font-bold text-gray-900">Services Management</h2>
             <p className="text-gray-500">Manage the services offered to citizens.</p>
           </div>
-          <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-emerald-700">
+          <button type="button" onClick={handleAddService} className="bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-emerald-700">
             <Plus className="w-4 h-4" /> Add Service
           </button>
         </div>
@@ -56,8 +112,12 @@ export default function AdminServices() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right flex justify-end gap-2">
-                    <button className="p-2 text-gray-400 hover:text-emerald-600"><Edit className="w-4 h-4" /></button>
-                    <button className="p-2 text-gray-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
+                    <button type="button" onClick={() => handleEditService(service.id)} className="p-2 text-gray-400 hover:text-emerald-600" aria-label={`Edit ${service.name}`}>
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button type="button" onClick={() => handleDeleteService(service.id)} className="p-2 text-gray-400 hover:text-red-600" aria-label={`Delete ${service.name}`}>
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </td>
                 </tr>
               ))}

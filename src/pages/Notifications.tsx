@@ -1,6 +1,7 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Bell, CheckCircle2, AlertCircle, Info, Clock } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { useState } from "react";
 
 const notifications = [
   {
@@ -38,6 +39,12 @@ const notifications = [
 ];
 
 export default function Notifications() {
+  const [items, setItems] = useState(notifications);
+
+  const handleMarkAllAsRead = () => {
+    setItems((currentItems) => currentItems.map((item) => ({ ...item, read: true })));
+  };
+
   return (
     <DashboardLayout role="citizen">
       <div className="max-w-3xl mx-auto space-y-8">
@@ -46,13 +53,13 @@ export default function Notifications() {
             <h2 className="text-2xl font-bold text-gray-900">Notifications</h2>
             <p className="text-gray-500">Stay updated on your applications and alerts.</p>
           </div>
-          <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+          <button type="button" onClick={handleMarkAllAsRead} className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
             Mark all as read
           </button>
         </div>
 
         <div className="space-y-4">
-          {notifications.map((notification) => (
+          {items.map((notification) => (
             <div 
               key={notification.id} 
               className={`bg-white p-4 rounded-xl border transition-all ${

@@ -1,8 +1,21 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { MessageSquare, ThumbsUp, Send, Users, FileWarning, HelpCircle } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 
 export default function CitizenEngagement() {
+  const [statusMessage, setStatusMessage] = useState("");
+
+  const handlePublicInput = () => {
+    window.location.href = "mailto:participation@countyconnect.go.ke?subject=Public%20Participation%20Input";
+    setStatusMessage("Opening your mail app to submit public input.");
+  };
+
+  const handleGrievance = () => {
+    window.location.href = "mailto:grievances@countyconnect.go.ke?subject=County%20Grievance";
+    setStatusMessage("Opening your mail app to lodge a grievance.");
+  };
+
   return (
     <DashboardLayout role="citizen">
       <div className="space-y-8">
@@ -39,7 +52,7 @@ export default function CitizenEngagement() {
               ))}
             </div>
             <div className="p-6 pt-0">
-               <button className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition flex items-center justify-center gap-2">
+               <button type="button" onClick={handlePublicInput} className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition flex items-center justify-center gap-2">
                  Submit Input <Send className="w-4 h-4" />
                </button>
             </div>
@@ -63,9 +76,10 @@ export default function CitizenEngagement() {
                   Report service delivery failures, corruption, or infrastructure issues directly to the Governor's office.
                 </p>
               </div>
-              <button className="px-8 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition shadow-lg shadow-red-100">
+              <button type="button" onClick={handleGrievance} className="px-8 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition shadow-lg shadow-red-100">
                 Lodge Grievance
               </button>
+              {statusMessage && <p className="text-xs font-medium text-emerald-700">{statusMessage}</p>}
             </div>
             <div className="p-6 border-t border-gray-50 bg-gray-50/50">
                <div className="flex items-center justify-between text-xs">

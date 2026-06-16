@@ -1,15 +1,39 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Plus, Users, Building2 } from "lucide-react";
+import { useState } from "react";
 
-const departments = [
-  { id: 1, name: "Trade & Industrialization", head: "Jane Doe", staff: 45, services: 12 },
-  { id: 2, name: "Lands & Physical Planning", head: "John Smith", staff: 32, services: 8 },
-  { id: 3, name: "Transport & Infrastructure", head: "Mike Johnson", staff: 56, services: 5 },
-  { id: 4, name: "Public Health", head: "Sarah Williams", staff: 89, services: 15 },
-  { id: 5, name: "Finance & Economic Planning", head: "Robert Brown", staff: 24, services: 3 },
+const initialDepartments = [
+  { id: 1, name: "Trade & Industrialization", head: "Mercy Wanjiku", staff: 45, services: 12 },
+  { id: 2, name: "Lands & Physical Planning", head: "Daniel Kiprono", staff: 32, services: 8 },
+  { id: 3, name: "Transport & Infrastructure", head: "Allan Muthama", staff: 56, services: 5 },
+  { id: 4, name: "Public Health", head: "Aisha Mohamed", staff: 89, services: 15 },
+  { id: 5, name: "Finance & Economic Planning", head: "Peter Mwangi", staff: 24, services: 3 },
 ];
 
 export default function AdminDepartments() {
+  const [departments, setDepartments] = useState(initialDepartments);
+
+  const handleAddDepartment = () => {
+    const departmentName = window.prompt("Department name", "New Department");
+
+    if (!departmentName) {
+      return;
+    }
+
+    const departmentHead = window.prompt("Department head", "County Officer") ?? "County Officer";
+
+    setDepartments((currentDepartments) => [
+      ...currentDepartments,
+      {
+        id: Date.now(),
+        name: departmentName,
+        head: departmentHead,
+        staff: 12,
+        services: 1,
+      },
+    ]);
+  };
+
   return (
     <DashboardLayout role="admin">
       <div className="space-y-6">
@@ -18,7 +42,7 @@ export default function AdminDepartments() {
             <h2 className="text-2xl font-bold text-gray-900">Departments</h2>
             <p className="text-gray-500">Manage county departments and personnel.</p>
           </div>
-          <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-emerald-700">
+          <button type="button" onClick={handleAddDepartment} className="bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-emerald-700">
             <Plus className="w-4 h-4" /> Add Department
           </button>
         </div>

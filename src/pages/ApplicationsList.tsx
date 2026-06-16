@@ -3,10 +3,11 @@ import { Search, Filter, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-
 import { Link } from "react-router-dom";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useState } from "react";
+import { CURRENT_CITIZEN } from "@/lib/profile";
 
 const allApplications = Array.from({ length: 50 }, (_, i) => ({
   id: `APP-2024-${String(i + 1).padStart(3, '0')}`,
-  applicant: i % 2 === 0 ? "John Doe" : "Jane Smith",
+  applicant: i % 2 === 0 ? CURRENT_CITIZEN.fullName : "Amina Wairimu Njoroge",
   service: i % 3 === 0 ? "Single Business Permit" : i % 3 === 1 ? "Land Rates Payment" : "Building Plan Approval",
   date: "2024-02-18",
   status: i % 4 === 0 ? "Approved" : i % 4 === 1 ? "Pending Review" : "Rejected",

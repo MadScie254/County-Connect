@@ -1,6 +1,7 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { BarChart3, TrendingUp, TrendingDown, Target, Zap, Globe, Map as MapIcon, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 import { 
   BarChart, 
   Bar, 
@@ -33,6 +34,8 @@ const sectorData = [
 ];
 
 export default function ExecutiveAnalytics() {
+   const [viewScope, setViewScope] = useState<"regional" | "county">("regional");
+
   return (
     <DashboardLayout role="admin">
       <div className="space-y-8">
@@ -47,9 +50,9 @@ export default function ExecutiveAnalytics() {
              </div>
           </div>
           <div className="flex items-center gap-3">
-             <button className="px-5 py-2.5 bg-gray-900 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-black transition shadow-2xl flex items-center gap-2">
+             <button type="button" onClick={() => setViewScope((currentScope) => (currentScope === "regional" ? "county" : "regional"))} className="px-5 py-2.5 bg-gray-900 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-black transition shadow-2xl flex items-center gap-2">
                 <Globe className="w-4 h-4 text-emerald-400" />
-                Regional View
+                {viewScope === "regional" ? "Regional View" : "County View"}
              </button>
           </div>
         </div>

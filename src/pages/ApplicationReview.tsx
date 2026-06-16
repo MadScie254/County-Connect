@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { formatDate, formatCurrency } from "@/lib/utils";
+import { CURRENT_CITIZEN } from "@/lib/profile";
 
 // Mock Data for a single application
 const applicationData = {
@@ -22,10 +23,10 @@ const applicationData = {
   status: "Pending Review",
   submittedDate: "2024-02-18",
   applicant: {
-    name: "John Doe",
-    idNumber: "12345678",
-    phone: "0712 345 678",
-    email: "john@example.com",
+    name: CURRENT_CITIZEN.fullName,
+    idNumber: CURRENT_CITIZEN.idNumber,
+    phone: CURRENT_CITIZEN.phone,
+    email: CURRENT_CITIZEN.email,
   },
   business: {
     name: "Acme Traders Ltd",
@@ -62,12 +63,24 @@ export default function ApplicationReview() {
     }, 1500);
   };
 
+  const handleDownload = (fileName: string) => {
+    const payload = `CountyConnect document download\n\nApplication: ${applicationData.id}\nDocument: ${fileName}\nApplicant: ${applicationData.applicant.name}\nGenerated: ${new Date().toISOString()}`;
+    const blob = new Blob([payload], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = fileName;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <DashboardLayout role="admin">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <button 
+            type="button"
             onClick={() => navigate("/admin")}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
@@ -165,7 +178,7 @@ export default function ApplicationReview() {
                         <p className="text-xs text-gray-500">{doc.size}</p>
                       </div>
                     </div>
-                    <button className="p-2 text-gray-400 hover:text-emerald-600 transition-colors">
+                    <button type="button" onClick={() => handleDownload(doc.name)} className="p-2 text-gray-400 hover:text-emerald-600 transition-colors">
                       <Download className="w-5 h-5" />
                     </button>
                   </div>
@@ -214,6 +227,7 @@ export default function ApplicationReview() {
               </div>
               <div className="p-6 space-y-3">
                 <button
+                  type="button"
                   onClick={() => handleAction("Approved")}
                   disabled={isProcessing || status === "Approved"}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -222,6 +236,7 @@ export default function ApplicationReview() {
                   {isProcessing && status === "Approved" ? "Processing..." : "Approve Application"}
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleAction("Rejected")}
                   disabled={isProcessing || status === "Rejected"}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -230,6 +245,8 @@ export default function ApplicationReview() {
                   Reject Application
                 </button>
                 <button
+                  type="button"
+                  onClick={() => handleAction("Changes Requested")}
                   disabled={isProcessing}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >

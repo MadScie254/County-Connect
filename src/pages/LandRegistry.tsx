@@ -14,15 +14,29 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "motion/react";
+import { CURRENT_CITIZEN } from "@/lib/profile";
 
 export default function LandRegistry() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationResult, setVerificationResult] = useState<null | { owner: string; status: string; confidence: string; lastTransfer: string }>(null);
 
   const handleSearch = () => {
+    if (!searchQuery.trim()) {
+      return;
+    }
+
     setIsVerifying(true);
-    setTimeout(() => setIsVerifying(false), 2000);
+    setTimeout(() => {
+      setIsVerifying(false);
+      setVerificationResult({
+        owner: CURRENT_CITIZEN.fullName,
+        status: "Verified",
+        confidence: "99.8% match",
+        lastTransfer: "Recorded 14 days ago",
+      });
+    }, 2000);
   };
 
   return (
@@ -36,12 +50,14 @@ export default function LandRegistry() {
           <div className="flex items-center gap-4">
             <div className="flex bg-gray-100 p-1 rounded-xl">
               <button
+                type="button"
                 onClick={() => setViewMode("list")}
                 className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white shadow-sm text-emerald-600' : 'text-gray-500 hover:text-gray-900'}`}
               >
                 <List className="w-5 h-5" />
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode("map")}
                 className={`p-2 rounded-lg transition-all ${viewMode === 'map' ? 'bg-white shadow-sm text-emerald-600' : 'text-gray-500 hover:text-gray-900'}`}
               >
@@ -98,6 +114,7 @@ export default function LandRegistry() {
                 className="w-full pl-14 pr-36 py-5 border border-gray-300 rounded-full focus:outline-none focus:ring-0 focus:border-emerald-500 shadow-sm text-lg font-medium"
               />
               <button 
+                type="button"
                 onClick={handleSearch}
                 disabled={isVerifying}
                 className="absolute right-2 top-2 bottom-2 bg-emerald-600 text-white px-8 rounded-full font-bold hover:bg-emerald-700 transition-all flex items-center gap-2 hover:scale-105 active:scale-95 disabled:opacity-50"
@@ -136,6 +153,34 @@ export default function LandRegistry() {
               </motion.div>
             </div>
 
+            {verificationResult && (
+              <div className="bg-white rounded-3xl border border-emerald-100 shadow-sm p-6">
+                <div className="flex items-center justify-between gap-4 mb-4">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Verification Result</p>
+                    <h4 className="text-xl font-bold text-gray-900">{searchQuery.toUpperCase()}</h4>
+                  </div>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700">
+                    {verificationResult.status}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                  <div className="rounded-2xl bg-gray-50 p-4 border border-gray-100">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Owner</p>
+                    <p className="mt-1 font-semibold text-gray-900">{verificationResult.owner}</p>
+                  </div>
+                  <div className="rounded-2xl bg-gray-50 p-4 border border-gray-100">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Confidence</p>
+                    <p className="mt-1 font-semibold text-gray-900">{verificationResult.confidence}</p>
+                  </div>
+                  <div className="rounded-2xl bg-gray-50 p-4 border border-gray-100">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Last Transfer</p>
+                    <p className="mt-1 font-semibold text-gray-900">{verificationResult.lastTransfer}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Blockchain History */}
             <div className="bg-gray-900 rounded-3xl shadow-2xl p-8 text-white relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 opacity-10">
@@ -149,7 +194,7 @@ export default function LandRegistry() {
                 <div className="space-y-4">
                   {[
                     { action: "Block 0xF821 Validation", detail: "Parcel NAI/B112 verified via NLIMS bridge", status: "Success", hash: "0x82...a1f" },
-                    { action: "Ownership Transfer", detail: "Asset 209/45 moved to John Doe", status: "Immutable", hash: "0x3e...b42" },
+                    { action: "Ownership Transfer", detail: `Asset 209/45 moved to ${CURRENT_CITIZEN.fullName}`, status: "Immutable", hash: "0x3e...b42" },
                     { action: "Anomaly Flagged", detail: "Suspicious transfer pattern on Plot 14", status: "Investigating", hash: "0x91...c99" },
                   ].map((item, idx) => (
                     <div key={idx} className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-center justify-between hover:bg-white/10 transition">
@@ -182,7 +227,7 @@ export default function LandRegistry() {
                 Real-time parcel visualization, zoning overlays, and public utilities mapping. 
                 County Connect GIS integrates directly with sub-county survey data.
               </p>
-              <button className="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black transition-all shadow-xl hover:shadow-gray-400">
+              <button type="button" className="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black transition-all shadow-xl hover:shadow-gray-400">
                 Enter Geospatial Workspace
               </button>
               <p className="mt-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest">Authorized Personnel Only</p>
