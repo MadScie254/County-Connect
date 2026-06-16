@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { getSelectedCounty } from "@/lib/counties";
 import { CURRENT_CITIZEN } from "@/lib/profile";
+import { logout } from "@/lib/auth";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -79,10 +80,10 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
     <div className="min-h-screen bg-gray-50 font-sans text-gray-900">
       {/* Mobile Header */}
       <div className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-gray-200 sticky top-0 z-20">
-        <div className="flex items-center gap-2 font-bold text-xl text-emerald-700">
+        <Link to="/" className="flex items-center gap-2 font-bold text-xl text-emerald-700">
           <ShieldCheck className="w-6 h-6" />
-          <span>CountyConnect</span>
-        </div>
+          <span>County Connect</span>
+        </Link>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 rounded-md hover:bg-gray-100"
@@ -107,12 +108,12 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
               )}
             >
               <div className="flex flex-col h-full">
-                <div className="flex items-center gap-2 px-6 h-16 border-b border-gray-200 flex-shrink-0">
+                <Link to="/" className="flex items-center gap-2 px-6 h-16 border-b border-gray-200 flex-shrink-0 hover:bg-gray-50 transition-colors">
                   <ShieldCheck className="w-6 h-6 text-emerald-600" />
-                  <span className="font-bold text-lg tracking-tight">
-                    CountyConnect
+                  <span className="font-bold text-lg tracking-tight text-gray-900">
+                    County Connect
                   </span>
-                </div>
+                </Link>
 
                 <div className="flex-1 p-4 overflow-y-auto custom-scrollbar">
                   <div className="mb-6 px-2">
@@ -177,6 +178,7 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
                 <div className="mt-auto p-4 border-t border-gray-200">
                   <Link
                     to="/"
+                    onClick={() => logout()}
                     className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-red-50 hover:text-red-600 transition-colors"
                   >
                     <LogOut className="w-5 h-5" />
