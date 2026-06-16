@@ -46,7 +46,7 @@ export default function CitizenEngagement() {
                     <span className="flex items-center gap-1"><ThumbsUp className="w-3 h-3" /> {p.supporters}</span>
                   </div>
                   <div className="mt-3 w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-emerald-500 h-full" style={{ width: i === 0 ? '75%' : '30%' }}></div>
+                    <div className={`bg-emerald-500 h-full ${i === 0 ? "w-3/4" : "w-[30%]"}`}></div>
                   </div>
                 </div>
               ))}

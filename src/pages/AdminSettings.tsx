@@ -3,11 +3,20 @@ import { Save } from "lucide-react";
 import { getSelectedCounty } from "@/lib/counties";
 import { useState, type FormEvent } from "react";
 
+interface CountySettings {
+  countyName: string;
+  supportEmail: string;
+  mpesaEnabled: boolean;
+  cardEnabled: boolean;
+  emailNotifications: boolean;
+  smsNotifications: boolean;
+}
+
 export default function AdminSettings() {
   const selectedCounty = getSelectedCounty();
   const storageKey = `countyconnect:settings:${selectedCounty.slug}`;
   const [savedMessage, setSavedMessage] = useState("");
-  const [settings, setSettings] = useState(() => {
+  const [settings, setSettings] = useState<CountySettings>(() => {
     if (typeof window === "undefined") {
       return {
         countyName: selectedCounty.name,
@@ -70,12 +79,12 @@ export default function AdminSettings() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">General Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">County Name</label>
+                  <label htmlFor="county-name" className="block text-sm font-medium text-gray-700 mb-1">County Name</label>
                   <input type="text" value={settings.countyName} onChange={(event) => setSettings((current) => ({ ...current, countyName: event.target.value }))} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Support Email</label>
-                  <input type="email" value={settings.supportEmail} onChange={(event) => setSettings((current) => ({ ...current, supportEmail: event.target.value }))} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500" />
+                  <label htmlFor="support-email" className="block text-sm font-medium text-gray-700 mb-1">Support Email</label>
+                  <input id="support-email" type="email" value={settings.supportEmail} onChange={(event) => setSettings((current: CountySettings) => ({ ...current, supportEmail: event.target.value }))} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500" title="Support email" placeholder="support@countyconnect.go.ke" />
                 </div>
               </div>
             </div>
@@ -89,7 +98,7 @@ export default function AdminSettings() {
                     <p className="text-sm text-gray-500">Enable M-Pesa payments for services</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" checked={settings.mpesaEnabled} onChange={(event) => setSettings((current) => ({ ...current, mpesaEnabled: event.target.checked }))} />
+                    <input id="mpesa-enabled" type="checkbox" className="sr-only peer" checked={settings.mpesaEnabled} onChange={(event) => setSettings((current: CountySettings) => ({ ...current, mpesaEnabled: event.target.checked }))} title="Enable M-Pesa integration" aria-label="Enable M-Pesa integration" />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                   </label>
                 </div>
@@ -99,7 +108,7 @@ export default function AdminSettings() {
                     <p className="text-sm text-gray-500">Enable credit/debit card processing</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" checked={settings.cardEnabled} onChange={(event) => setSettings((current) => ({ ...current, cardEnabled: event.target.checked }))} />
+                    <input id="card-enabled" type="checkbox" className="sr-only peer" checked={settings.cardEnabled} onChange={(event) => setSettings((current: CountySettings) => ({ ...current, cardEnabled: event.target.checked }))} title="Enable card payments" aria-label="Enable card payments" />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                   </label>
                 </div>

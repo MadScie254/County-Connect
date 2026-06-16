@@ -7,7 +7,7 @@ export default function UserProfile() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [saveMessage, setSaveMessage] = useState("");
-  const [profile, setProfile] = useState(() => {
+  const [profile, setProfile] = useState<CitizenProfile>(() => {
     if (typeof window === "undefined") {
       return CURRENT_CITIZEN;
     }
@@ -62,7 +62,8 @@ export default function UserProfile() {
           {/* Profile Card */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 text-center h-fit">
             <div className="relative inline-block mb-4">
-              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+              <label htmlFor="avatar-upload" className="sr-only">Profile photo upload</label>
+              <input ref={fileInputRef} id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} aria-hidden="true" tabIndex={-1} title="Profile photo upload" />
               {avatarPreview ? (
                 <img
                   src={avatarPreview}
@@ -74,7 +75,7 @@ export default function UserProfile() {
                   {profile.initials}
                 </div>
               )}
-              <button type="button" onClick={handleAvatarClick} className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-md border border-gray-200 text-gray-500 hover:text-emerald-600">
+              <button type="button" onClick={handleAvatarClick} aria-label="Change profile photo" title="Change profile photo" className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-md border border-gray-200 text-gray-500 hover:text-emerald-600">
                 <Camera className="w-4 h-4" />
               </button>
             </div>
@@ -92,38 +93,38 @@ export default function UserProfile() {
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <label htmlFor="first-name" className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input type="text" value={profile.firstName} onChange={(event) => setProfile((current) => ({ ...current, firstName: event.target.value, fullName: `${event.target.value} ${current.lastName}`.trim() }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                    <input id="first-name" type="text" value={profile.firstName} onChange={(event) => setProfile((current: CitizenProfile) => ({ ...current, firstName: event.target.value, fullName: `${event.target.value} ${current.lastName}`.trim() }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="First name" placeholder="Daniel" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <label htmlFor="last-name" className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input type="text" value={profile.lastName} onChange={(event) => setProfile((current) => ({ ...current, lastName: event.target.value, fullName: `${current.firstName} ${event.target.value}`.trim() }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                    <input id="last-name" type="text" value={profile.lastName} onChange={(event) => setProfile((current: CitizenProfile) => ({ ...current, lastName: event.target.value, fullName: `${current.firstName} ${event.target.value}`.trim() }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="Last name" placeholder="Wanjala Machimbo" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                  <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input type="email" value={profile.email} onChange={(event) => setProfile((current) => ({ ...current, email: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                    <input id="email-address" type="email" value={profile.email} onChange={(event) => setProfile((current: CitizenProfile) => ({ ...current, email: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="Email address" placeholder="daniel.wanjala@county.go.ke" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                  <label htmlFor="phone-number" className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input type="tel" value={profile.phone} onChange={(event) => setProfile((current) => ({ ...current, phone: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                    <input id="phone-number" type="tel" value={profile.phone} onChange={(event) => setProfile((current: CitizenProfile) => ({ ...current, phone: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="Phone number" placeholder="0712 345 678" />
                   </div>
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Physical Address</label>
+                  <label htmlFor="physical-address" className="block text-sm font-medium text-gray-700 mb-1">Physical Address</label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input type="text" value={profile.address} onChange={(event) => setProfile((current) => ({ ...current, address: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                    <input id="physical-address" type="text" value={profile.address} onChange={(event) => setProfile((current: CitizenProfile) => ({ ...current, address: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="Physical address" placeholder="P.O. Box 12345, Nairobi" />
                   </div>
                 </div>
               </div>

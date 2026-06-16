@@ -31,6 +31,7 @@ const awardDistribution = [
 ];
 
 const COLORS = ['#059669', '#3b82f6', '#f59e0b', '#9ca3af'];
+const COLOR_CLASSES = ['bg-emerald-500', 'bg-blue-500', 'bg-amber-500', 'bg-gray-400'];
 
 export default function ProcurementDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -181,7 +182,7 @@ export default function ProcurementDashboard() {
                 {awardDistribution.map((item, index) => (
                   <div key={index} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                      <div className={`w-3 h-3 rounded-full ${COLOR_CLASSES[index % COLOR_CLASSES.length]}`}></div>
                       <span className="text-gray-600">{item.name}</span>
                     </div>
                     <span className="font-medium text-gray-900">{item.value}%</span>

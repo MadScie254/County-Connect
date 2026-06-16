@@ -3,6 +3,13 @@ import { Coins, Smartphone, TrendingUp, AlertCircle, BarChart3, Search, Filter }
 import { motion } from "motion/react";
 import { useState } from "react";
 
+const TARGET_WIDTH_CLASSES: Record<string, string> = {
+   "80%": "w-4/5",
+   "95%": "w-[95%]",
+   "65%": "w-[65%]",
+   "40%": "w-2/5",
+};
+
 export default function RevenueCollection() {
    const [advancedReconEnabled, setAdvancedReconEnabled] = useState(false);
    const [treasuryMessage, setTreasuryMessage] = useState("");
@@ -98,7 +105,7 @@ export default function RevenueCollection() {
                              <span className="text-gray-900">{s.value}</span>
                           </div>
                           <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden flex">
-                             <div className={`${s.color} h-full rounded-full transition-all duration-1000`} style={{ width: s.target }}></div>
+                             <div className={`${s.color} ${TARGET_WIDTH_CLASSES[s.target] ?? "w-full"} h-full rounded-full transition-all duration-1000`}></div>
                           </div>
                           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">{s.target} of Daily Goal</p>
                        </div>

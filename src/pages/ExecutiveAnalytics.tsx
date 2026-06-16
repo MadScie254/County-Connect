@@ -27,10 +27,10 @@ const revenueData = [
 ];
 
 const sectorData = [
-  { name: 'Business Permits', value: 45, color: '#059669' },
-  { name: 'Land Rates', value: 30, color: '#2563eb' },
-  { name: 'Parking', value: 15, color: '#f59e0b' },
-  { name: 'Health Fees', value: 10, color: '#ef4444' },
+   { name: 'Business Permits', value: 45, color: '#059669', dotClass: 'bg-emerald-500' },
+   { name: 'Land Rates', value: 30, color: '#2563eb', dotClass: 'bg-blue-500' },
+   { name: 'Parking', value: 15, color: '#f59e0b', dotClass: 'bg-amber-500' },
+   { name: 'Health Fees', value: 10, color: '#ef4444', dotClass: 'bg-red-500' },
 ];
 
 export default function ExecutiveAnalytics() {
@@ -97,7 +97,7 @@ export default function ExecutiveAnalytics() {
                     <h3 className="text-xl font-black text-gray-900 tracking-tight italic">Consolidated Revenue Trend</h3>
                     <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Aggregate across all mobile & bank channels</p>
                  </div>
-                 <select className="bg-gray-50 border border-gray-100 text-[10px] font-black rounded-lg px-3 py-1 uppercase focus:outline-none focus:ring-1 focus:ring-gray-900">
+                 <select aria-label="Revenue time range" className="bg-gray-50 border border-gray-100 text-[10px] font-black rounded-lg px-3 py-1 uppercase focus:outline-none focus:ring-1 focus:ring-gray-900">
                     <option>Last 6 Months</option>
                     <option>Year to Date</option>
                  </select>
@@ -161,7 +161,7 @@ export default function ExecutiveAnalytics() {
                  {sectorData.map((s, i) => (
                     <div key={i} className="flex items-center justify-between group cursor-default">
                        <div className="flex items-center gap-3">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }}></div>
+                          <div className={`w-3 h-3 rounded-full ${s.dotClass}`}></div>
                           <span className="text-sm font-bold text-gray-700 group-hover:text-gray-900 transition">{s.name}</span>
                        </div>
                        <span className="text-sm font-black text-gray-900">{s.value}%</span>

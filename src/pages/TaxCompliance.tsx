@@ -99,6 +99,8 @@ export default function TaxCompliance() {
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">KES</span>
                         <input 
                           type="number" 
+                                       title="Monthly revenue"
+                                       placeholder="0"
                           value={revenue} 
                           onChange={(e) => setRevenue(e.target.value)}
                           className="w-full pl-14 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-lg font-bold"
@@ -111,6 +113,8 @@ export default function TaxCompliance() {
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">KES</span>
                         <input 
                           type="number" 
+                                       title="Monthly expenses"
+                                       placeholder="0"
                           value={expenses} 
                           onChange={(e) => setExpenses(e.target.value)}
                           className="w-full pl-14 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 text-lg font-bold"

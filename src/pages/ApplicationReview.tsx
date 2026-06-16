@@ -82,8 +82,10 @@ export default function ApplicationReview() {
           <button 
             type="button"
             onClick={() => navigate("/admin")}
+            aria-label="Back to applications list"
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
+            <span className="sr-only">Back to applications list</span>
             <ChevronLeft className="w-6 h-6 text-gray-500" />
           </button>
           <div>
@@ -178,7 +180,8 @@ export default function ApplicationReview() {
                         <p className="text-xs text-gray-500">{doc.size}</p>
                       </div>
                     </div>
-                    <button type="button" onClick={() => handleDownload(doc.name)} className="p-2 text-gray-400 hover:text-emerald-600 transition-colors">
+                    <button type="button" onClick={() => handleDownload(doc.name)} aria-label={`Download ${doc.name}`} title={`Download ${doc.name}`} className="p-2 text-gray-400 hover:text-emerald-600 transition-colors">
+                      <span className="sr-only">Download {doc.name}</span>
                       <Download className="w-5 h-5" />
                     </button>
                   </div>
