@@ -2,7 +2,15 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Plus, Edit, Trash2, Search } from "lucide-react";
 import { useState } from "react";
 
-const initialServices = [
+type ServiceItem = {
+  id: number;
+  name: string;
+  department: string;
+  fee: string;
+  status: string;
+};
+
+const initialServices: ServiceItem[] = [
   { id: 1, name: "Single Business Permit", department: "Trade", fee: "Variable", status: "Active" },
   { id: 2, name: "Land Rates", department: "Lands", fee: "Variable", status: "Active" },
   { id: 3, name: "Parking", department: "Transport", fee: "Fixed", status: "Active" },
@@ -11,7 +19,7 @@ const initialServices = [
 ];
 
 export default function AdminServices() {
-  const [services, setServices] = useState(initialServices);
+  const [services, setServices] = useState<ServiceItem[]>(initialServices);
 
   const handleAddService = () => {
     const serviceName = window.prompt("Service name", "County Service");
@@ -22,7 +30,7 @@ export default function AdminServices() {
 
     const departmentName = window.prompt("Owning department", "General Administration") ?? "General Administration";
 
-    setServices((currentServices) => [
+    setServices((currentServices: ServiceItem[]) => [
       ...currentServices,
       {
         id: Date.now(),
@@ -35,7 +43,7 @@ export default function AdminServices() {
   };
 
   const handleEditService = (serviceId: number) => {
-    const currentService = services.find((service) => service.id === serviceId);
+    const currentService = services.find((service: ServiceItem) => service.id === serviceId);
 
     if (!currentService) {
       return;
@@ -47,11 +55,11 @@ export default function AdminServices() {
       return;
     }
 
-    setServices((currentServices) => currentServices.map((service) => service.id === serviceId ? { ...service, name: updatedName } : service));
+    setServices((currentServices: ServiceItem[]) => currentServices.map((service: ServiceItem) => service.id === serviceId ? { ...service, name: updatedName } : service));
   };
 
   const handleDeleteService = (serviceId: number) => {
-    const currentService = services.find((service) => service.id === serviceId);
+    const currentService = services.find((service: ServiceItem) => service.id === serviceId);
 
     if (!currentService) {
       return;
@@ -63,7 +71,7 @@ export default function AdminServices() {
       return;
     }
 
-    setServices((currentServices) => currentServices.filter((service) => service.id !== serviceId));
+    setServices((currentServices: ServiceItem[]) => currentServices.filter((service: ServiceItem) => service.id !== serviceId));
   };
 
   return (
@@ -101,7 +109,7 @@ export default function AdminServices() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {services.map((service) => (
+              {services.map((service: ServiceItem) => (
                 <tr key={service.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 font-medium text-gray-900">{service.name}</td>
                   <td className="px-6 py-4 text-gray-600">{service.department}</td>
