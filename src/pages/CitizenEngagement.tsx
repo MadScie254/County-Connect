@@ -1,10 +1,17 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { MessageSquare, ThumbsUp, Send, Users, FileWarning, HelpCircle } from "lucide-react";
-import { motion } from "motion/react";
 import { useState } from "react";
+import { getPetitions, votePetition } from "@/lib/store";
 
 export default function CitizenEngagement() {
   const [statusMessage, setStatusMessage] = useState("");
+  const [petitions, setPetitions] = useState(getPetitions());
+
+  const handleVote = (id: number) => {
+    votePetition(id);
+    setPetitions(getPetitions());
+    setStatusMessage("Your signature has been securely recorded on the county ledger.");
+  };
 
   const handlePublicInput = () => {
     window.location.href = "mailto:participation@countyconnect.go.ke?subject=Public%20Participation%20Input";
@@ -35,18 +42,15 @@ export default function CitizenEngagement() {
               <span className="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">3 OPEN</span>
             </div>
             <div className="p-6 flex-1 space-y-6">
-              {[
-                { title: "Nairobi County Budget 2026/27", deadline: "Closes in 5 days", supporters: "4,250 citizens signed" },
-                { title: "Westlands Urban Renewal Plan", deadline: "Closes in 12 days", supporters: "1,120 citizens signed" },
-              ].map((p, i) => (
-                <div key={i} className="group cursor-pointer">
+              {petitions.map((p, i) => (
+                <div key={p.id} className="group cursor-pointer" onClick={() => handleVote(p.id)}>
                   <h4 className="font-bold text-gray-900 group-hover:text-emerald-600 transition-colors mb-1">{p.title}</h4>
                   <div className="flex items-center justify-between text-xs text-gray-500 font-medium">
                     <span>{p.deadline}</span>
-                    <span className="flex items-center gap-1"><ThumbsUp className="w-3 h-3" /> {p.supporters}</span>
+                    <span className="flex items-center gap-1"><ThumbsUp className="w-3 h-3" /> {p.supporters.toLocaleString()} citizens signed</span>
                   </div>
                   <div className="mt-3 w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                    <div className={`bg-emerald-500 h-full ${i === 0 ? "w-3/4" : "w-[30%]"}`}></div>
+                    <div className="bg-emerald-500 h-full" style={{ width: `${Math.min(100, (p.supporters / p.totalNeeded) * 100)}%` }}></div>
                   </div>
                 </div>
               ))}
