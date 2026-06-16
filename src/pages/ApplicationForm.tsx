@@ -4,6 +4,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { CheckCircle2, ChevronRight, Upload, CreditCard, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
+import { CURRENT_CITIZEN } from "@/lib/profile";
+import { addApplication, addRevenueEntry } from "@/lib/store";
 
 const steps = [
   { id: 1, name: "Business Details" },
@@ -19,6 +21,12 @@ export default function ApplicationForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"mpesa" | "card">("mpesa");
+  
+  // Form State
+  const [businessName, setBusinessName] = useState("");
+  const [address, setAddress] = useState("");
+  const [subCounty, setSubCounty] = useState("Westlands");
+  const [ward, setWard] = useState("Kilimani");
 
   const handleNext = () => {
     if (currentStep < steps.length) {
@@ -36,11 +44,36 @@ export default function ApplicationForm() {
 
   const handleSubmit = () => {
     setIsSubmitting(true);
-    // Simulate API call
+    
+    // Create Application
+    addApplication({
+      applicant: CURRENT_CITIZEN.fullName,
+      applicantId: CURRENT_CITIZEN.idNumber,
+      applicantEmail: CURRENT_CITIZEN.email,
+      applicantPhone: CURRENT_CITIZEN.phone,
+      service: "Single Business Permit",
+      amount: 15000,
+      businessName: businessName || "New Business Ltd",
+      ward: ward,
+      subCounty: subCounty,
+      address: address || "P.O. Box 123",
+      type: "business"
+    });
+
+    // Create Revenue Entry
+    addRevenueEntry({
+      ref: `RC-${Date.now().toString().slice(-6)}`,
+      amount: 15000,
+      user: CURRENT_CITIZEN.fullName,
+      stream: "Business Permit",
+      time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+      reconciled: false
+    });
+
     setTimeout(() => {
       setIsSubmitting(false);
       navigate("/dashboard");
-    }, 2000);
+    }, 1500);
   };
 
   return (
@@ -97,7 +130,7 @@ export default function ApplicationForm() {
                 <div className="grid grid-cols-1 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
-                    <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. Acme Traders Ltd" />
+                    <input type="text" value={businessName} onChange={e => setBusinessName(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. Acme Traders Ltd" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Registration Number</label>
@@ -123,7 +156,7 @@ export default function ApplicationForm() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Sub-County</label>
-                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <select value={subCounty} onChange={e => setSubCounty(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                       <option>Select Sub-County...</option>
                       <option>Westlands</option>
                       <option>Kasarani</option>
@@ -132,7 +165,7 @@ export default function ApplicationForm() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Ward</label>
-                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <select value={ward} onChange={e => setWard(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                       <option>Select Ward...</option>
                       <option>Kilimani</option>
                       <option>Kileleshwa</option>
@@ -140,7 +173,7 @@ export default function ApplicationForm() {
                   </div>
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Physical Address / Plot No.</label>
-                    <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. Plot 209/123, Moi Avenue" />
+                    <input type="text" value={address} onChange={e => setAddress(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. Plot 209/123, Moi Avenue" />
                   </div>
                 </div>
               </div>
@@ -174,11 +207,11 @@ export default function ApplicationForm() {
                   </div>
                   <div className="flex justify-between border-b border-gray-200 pb-2">
                     <span className="text-gray-500 text-sm">Business Name</span>
-                    <span className="font-medium text-gray-900 text-sm">Acme Traders Ltd</span>
+                    <span className="font-medium text-gray-900 text-sm">{businessName || "N/A"}</span>
                   </div>
                   <div className="flex justify-between border-b border-gray-200 pb-2">
                     <span className="text-gray-500 text-sm">Location</span>
-                    <span className="font-medium text-gray-900 text-sm">Westlands, Kilimani</span>
+                    <span className="font-medium text-gray-900 text-sm">{subCounty}, {ward}</span>
                   </div>
                   <div className="flex justify-between pt-2">
                     <span className="text-gray-900 font-semibold">Total Fee</span>

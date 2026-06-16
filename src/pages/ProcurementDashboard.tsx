@@ -14,15 +14,7 @@ import {
 import { Search, Filter, AlertTriangle, CheckCircle2, Building2, FileText, TrendingUp } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
-
-const tenders = [
-  { id: "TND-2024-001", title: "Construction of Market Stalls", entity: "Nairobi County", value: 45000000, status: "Open", deadline: "2024-03-15" },
-  { id: "TND-2024-002", title: "Supply of Medical Equipment", entity: "Ministry of Health", value: 120000000, status: "Evaluated", deadline: "2024-02-10" },
-  { id: "TND-2024-003", title: "Road Maintenance - Ward 4", entity: "Kiambu County", value: 28000000, status: "Awarded", deadline: "2024-01-20" },
-  { id: "TND-2024-004", title: "ICT Infrastructure Upgrade", entity: "Nairobi County", value: 15000000, status: "Open", deadline: "2024-03-20" },
-  { id: "TND-2024-005", title: "Garbage Collection Services", entity: "Mombasa County", value: 8500000, status: "Awarded", deadline: "2024-01-15" },
-];
-
+import { getTenders } from "@/lib/store";
 const awardDistribution = [
   { name: "Mega Corp Ltd", value: 12 },
   { name: "BuildWell Inc", value: 8 },
@@ -36,13 +28,17 @@ const COLOR_CLASSES = ['bg-emerald-500', 'bg-blue-500', 'bg-amber-500', 'bg-gray
 export default function ProcurementDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [openOnly, setOpenOnly] = useState(false);
+  const allTenders = getTenders();
 
-  const filteredTenders = tenders.filter((tender) => {
+  const filteredTenders = allTenders.filter((tender) => {
     const matchesSearch = [tender.id, tender.title, tender.entity].join(" ").toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = !openOnly || tender.status === "Open";
 
     return matchesSearch && matchesStatus;
   });
+
+  const activeTenders = allTenders.filter(t => t.status === "Open").length;
+  const totalValue = allTenders.reduce((acc, t) => acc + t.value, 0);
 
   const handleSearch = () => {
     const nextSearch = window.prompt("Search tenders, entities, or IDs", searchTerm) ?? searchTerm;
@@ -75,7 +71,7 @@ export default function ProcurementDashboard() {
                 <FileText className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-gray-900">142</div>
+            <div className="text-2xl font-bold text-gray-900">{activeTenders}</div>
             <p className="text-xs text-gray-500 mt-1">Across 47 counties</p>
           </div>
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
@@ -85,7 +81,7 @@ export default function ProcurementDashboard() {
                 <TrendingUp className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-gray-900">KES 4.2B</div>
+            <div className="text-2xl font-bold text-gray-900">{formatCurrency(totalValue)}</div>
             <p className="text-xs text-gray-500 mt-1">This financial year</p>
           </div>
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
@@ -142,6 +138,7 @@ export default function ProcurementDashboard() {
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                           tender.status === 'Awarded' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
                           tender.status === 'Open' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                          tender.status === 'Evaluated' ? 'bg-amber-50 text-amber-700 border-amber-100' :
                           'bg-gray-50 text-gray-700 border-gray-100'
                         }`}>
                           {tender.status}

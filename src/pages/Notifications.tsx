@@ -2,47 +2,14 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Bell, CheckCircle2, AlertCircle, Info, Clock } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useState } from "react";
-
-const notifications = [
-  {
-    id: 1,
-    title: "Application Approved",
-    message: "Your Single Business Permit application (APP-2024-001) has been approved.",
-    type: "success",
-    date: "2024-02-18T10:30:00",
-    read: false,
-  },
-  {
-    id: 2,
-    title: "Payment Received",
-    message: "We received your payment of KES 15,000 for Application APP-2024-001.",
-    type: "info",
-    date: "2024-02-18T10:25:00",
-    read: true,
-  },
-  {
-    id: 3,
-    title: "Action Required",
-    message: "Please upload the missing KRA PIN certificate for your Land Rates application.",
-    type: "warning",
-    date: "2024-02-17T14:15:00",
-    read: false,
-  },
-  {
-    id: 4,
-    title: "System Maintenance",
-    message: "The portal will be undergoing scheduled maintenance on Sunday, 25th Feb.",
-    type: "info",
-    date: "2024-02-15T09:00:00",
-    read: true,
-  },
-];
+import { getNotifications, markAllNotificationsRead } from "@/lib/store";
 
 export default function Notifications() {
-  const [items, setItems] = useState(notifications);
+  const [items, setItems] = useState(getNotifications());
 
   const handleMarkAllAsRead = () => {
-    setItems((currentItems) => currentItems.map((item) => ({ ...item, read: true })));
+    markAllNotificationsRead();
+    setItems(getNotifications());
   };
 
   return (

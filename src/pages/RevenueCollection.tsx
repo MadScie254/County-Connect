@@ -1,7 +1,9 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Coins, Smartphone, TrendingUp, AlertCircle, BarChart3, Search, Filter } from "lucide-react";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getRevenueEntries, subscribe } from "@/lib/store";
+import { formatCurrency } from "@/lib/utils";
 
 const TARGET_WIDTH_CLASSES: Record<string, string> = {
    "80%": "w-4/5",
@@ -13,6 +15,17 @@ const TARGET_WIDTH_CLASSES: Record<string, string> = {
 export default function RevenueCollection() {
    const [advancedReconEnabled, setAdvancedReconEnabled] = useState(false);
    const [treasuryMessage, setTreasuryMessage] = useState("");
+   const [revenueEntries, setRevenueEntries] = useState(getRevenueEntries());
+
+   useEffect(() => {
+     const unsubscribe = subscribe("revenue:new", () => {
+       setRevenueEntries(getRevenueEntries());
+     });
+     return unsubscribe;
+   }, []);
+
+   const recentEntries = revenueEntries.slice(0, 10);
+   const totalMpesa = revenueEntries.reduce((sum, entry) => sum + entry.amount, 0);
 
    const handleTreasuryPush = () => {
       setTreasuryMessage("Revenue batch queued for IFMIS treasury sync and audit log export.");
@@ -40,12 +53,11 @@ export default function RevenueCollection() {
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
               Live Feed
            </div>
-           <div className="flex gap-12 animate-marquee whitespace-nowrap font-mono text-sm">
-              <span>[08:42:11] Parking Unit NAI-422: KES 200.00 RECONCILED (ref: 0x82...a1f)</span>
-              <span>[08:42:05] Market Fee Stall B12: KES 50.00 RECONCILED (ref: 0x3e...b42)</span>
-              <span>[08:41:55] Single Business Permit Renewal: KES 12,500.00 RECONCILED (ref: 0x91...c99)</span>
-              <span>[08:41:40] Fire Inspection Fee: KES 4,500.00 RECONCILED (ref: 0x11...x22)</span>
-           </div>
+            <div className="flex gap-12 animate-marquee whitespace-nowrap font-mono text-sm">
+              {recentEntries.map((entry, idx) => (
+                <span key={idx}>[{entry.time}] {entry.user}: {formatCurrency(entry.amount)} {entry.reconciled ? "RECONCILED" : "PENDING"} (ref: {entry.ref})</span>
+              ))}
+            </div>
         </div>
 
         {/* Revenue KPIs */}
@@ -56,7 +68,7 @@ export default function RevenueCollection() {
                 <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">MOBILE MONEY FIRST</span>
              </div>
              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">M-PESA Daily Flow</p>
-             <h3 className="text-3xl font-black text-gray-900 mb-2">KES 14.8M</h3>
+             <h3 className="text-3xl font-black text-gray-900 mb-2">{formatCurrency(totalMpesa)}</h3>
              <div className="flex items-center gap-2 text-xs font-bold text-emerald-600">
                 <TrendingUp className="w-3 h-3" /> +18.2% (MTD)
              </div>
@@ -130,24 +142,20 @@ export default function RevenueCollection() {
                 </div>
               </div>
               <div className="p-8 flex-1">
-                 <div className="space-y-4">
-                    {[
-                       { ref: "RK2190XS", amount: "+ 200.00", user: "Parking Unit 42", time: "08:44" },
-                       { ref: "RK2190XT", amount: "+ 50.00", user: "Market Stall B1", time: "08:44" },
-                       { ref: "RK2190XU", amount: "+ 5,500.00", user: "SBP Renewal", time: "08:43" },
-                    ].map((entry, idx) => (
+                  <div className="space-y-4">
+                    {revenueEntries.slice(0, 5).map((entry, idx) => (
                        <div key={idx} className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition group cursor-default">
                           <div className="flex items-center gap-4">
                              <p className="text-emerald-400 font-mono text-sm">{entry.time}</p>
                              <div>
-                                <p className="text-sm font-bold text-white group-hover:text-emerald-400 transition">{entry.user}</p>
+                                <p className="text-sm font-bold text-white group-hover:text-emerald-400 transition">{entry.stream}</p>
                                 <p className="text-[10px] text-gray-500 font-mono italic">{entry.ref}</p>
                              </div>
                           </div>
-                          <p className="text-sm font-black text-emerald-400">{entry.amount}</p>
+                          <p className="text-sm font-black text-emerald-400">{formatCurrency(entry.amount)}</p>
                        </div>
                     ))}
-                 </div>
+                  </div>
               </div>
               <div className="p-8 pt-0 mt-4">
                  <button type="button" onClick={handleTreasuryPush} className="w-full py-4 bg-emerald-500 text-black font-black rounded-2xl hover:bg-emerald-400 transition shadow-xl shadow-emerald-500/20 uppercase tracking-widest text-sm italic">

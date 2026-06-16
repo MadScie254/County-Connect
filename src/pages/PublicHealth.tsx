@@ -1,13 +1,18 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { HeartPulse, FlaskConical, Stethoscope, ClipboardList, Package, TrendingUp, Search } from "lucide-react";
-import { motion } from "motion/react";
 import { useState } from "react";
+import { getHealthDrugs, updateDrugStock } from "@/lib/store";
 
 export default function PublicHealth() {
    const [restockMessage, setRestockMessage] = useState("");
    const [dispatchMessage, setDispatchMessage] = useState("");
+   const [healthDrugs, setHealthDrugs] = useState(getHealthDrugs());
 
    const handleRestockAll = () => {
+      healthDrugs.filter(d => d.level === "critical").forEach(d => {
+         updateDrugStock(d.id, { stock: "Restocked (100 units)", level: "high" });
+      });
+      setHealthDrugs(getHealthDrugs());
       setRestockMessage("Critical stock-out facilities have been queued for immediate replenishment.");
    };
 
@@ -48,8 +53,8 @@ export default function PublicHealth() {
                 <Package className="w-12 h-12" />
              </div>
              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Critical Stock Outs</p>
-             <h3 className="text-4xl font-black text-red-600">3</h3>
-             <p className="text-xs font-bold text-gray-400 mt-2">Nairobi Area Facilities</p>
+             <h3 className="text-4xl font-black text-red-600">{healthDrugs.filter(d => d.level === "critical").length}</h3>
+             <p className="text-xs font-bold text-gray-400 mt-2">Facilities Reporting</p>
           </div>
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group">
              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition duration-500 cursor-default">
@@ -82,13 +87,8 @@ export default function PublicHealth() {
               </div>
               <div className="p-6">
                  <div className="space-y-4">
-                   {[
-                      { name: "Amoxicillin 500mg", facility: "Westlands Health Centre", stock: "24 units", level: "critical" },
-                      { name: "Paracetamol Syrup", facility: "Pumwani Maternity", stock: "850 units", level: "high" },
-                      { name: "Cezitirin (100ml)", facility: "Kasarani Clinic", stock: "12 units", level: "critical" },
-                      { name: "Surgical Gloves", facility: "City Hall Dispensary", stock: "1,200 pairs", level: "high" },
-                   ].map((item, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 border border-gray-50 rounded-xl hover:bg-gray-50 transition">
+                   {healthDrugs.slice(0, 4).map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-3 border border-gray-50 rounded-xl hover:bg-gray-50 transition">
                          <div>
                             <p className="text-sm font-bold text-gray-900">{item.name}</p>
                             <p className="text-[10px] text-gray-400 font-bold uppercase">{item.facility}</p>

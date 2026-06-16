@@ -3,23 +3,14 @@ import { Search, Filter, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-
 import { Link } from "react-router-dom";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useState } from "react";
-import { CURRENT_CITIZEN } from "@/lib/profile";
-
-const allApplications = Array.from({ length: 50 }, (_, i) => ({
-  id: `APP-2024-${String(i + 1).padStart(3, '0')}`,
-  applicant: i % 2 === 0 ? CURRENT_CITIZEN.fullName : "Amina Wairimu Njoroge",
-  service: i % 3 === 0 ? "Single Business Permit" : i % 3 === 1 ? "Land Rates Payment" : "Building Plan Approval",
-  date: "2024-02-18",
-  status: i % 4 === 0 ? "Approved" : i % 4 === 1 ? "Pending Review" : "Rejected",
-  amount: (i + 1) * 1000,
-}));
-
+import { getApplications } from "@/lib/store";
 const ITEMS_PER_PAGE = 10;
 
 export default function ApplicationsList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const allApplications = getApplications();
 
   const filteredApps = allApplications.filter((app) => {
     const matchesSearch = 
@@ -104,6 +95,7 @@ export default function ApplicationsList() {
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                         app.status === 'Approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
                         app.status === 'Pending Review' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                        app.status === 'Changes Requested' ? 'bg-amber-50 text-amber-700 border-amber-100' :
                         'bg-red-50 text-red-700 border-red-100'
                       }`}>
                         {app.status}

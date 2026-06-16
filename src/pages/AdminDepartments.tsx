@@ -2,16 +2,10 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Plus, Users, Building2 } from "lucide-react";
 import { useState } from "react";
 
-const initialDepartments = [
-  { id: 1, name: "Trade & Industrialization", head: "Mercy Wanjiku", staff: 45, services: 12 },
-  { id: 2, name: "Lands & Physical Planning", head: "Daniel Kiprono", staff: 32, services: 8 },
-  { id: 3, name: "Transport & Infrastructure", head: "Allan Muthama", staff: 56, services: 5 },
-  { id: 4, name: "Public Health", head: "Aisha Mohamed", staff: 89, services: 15 },
-  { id: 5, name: "Finance & Economic Planning", head: "Peter Mwangi", staff: 24, services: 3 },
-];
+import { getDepartments, addDepartment } from "@/lib/store";
 
 export default function AdminDepartments() {
-  const [departments, setDepartments] = useState(initialDepartments);
+  const [departments, setDepartments] = useState(getDepartments());
 
   const handleAddDepartment = () => {
     const departmentName = window.prompt("Department name", "New Department");
@@ -22,16 +16,13 @@ export default function AdminDepartments() {
 
     const departmentHead = window.prompt("Department head", "County Officer") ?? "County Officer";
 
-    setDepartments((currentDepartments) => [
-      ...currentDepartments,
-      {
-        id: Date.now(),
-        name: departmentName,
-        head: departmentHead,
-        staff: 12,
-        services: 1,
-      },
-    ]);
+    addDepartment({
+      name: departmentName,
+      head: departmentHead,
+      staff: 12,
+      services: 1,
+    });
+    setDepartments(getDepartments());
   };
 
   return (

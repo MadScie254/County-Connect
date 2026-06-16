@@ -2,24 +2,11 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Plus, Edit, Trash2, Search } from "lucide-react";
 import { useState } from "react";
 
-type ServiceItem = {
-  id: number;
-  name: string;
-  department: string;
-  fee: string;
-  status: string;
-};
-
-const initialServices: ServiceItem[] = [
-  { id: 1, name: "Single Business Permit", department: "Trade", fee: "Variable", status: "Active" },
-  { id: 2, name: "Land Rates", department: "Lands", fee: "Variable", status: "Active" },
-  { id: 3, name: "Parking", department: "Transport", fee: "Fixed", status: "Active" },
-  { id: 4, name: "Building Approval", department: "Planning", fee: "Variable", status: "Active" },
-  { id: 5, name: "Food Hygiene", department: "Health", fee: "Fixed", status: "Active" },
-];
+import { getServices, addService, updateService, removeService } from "@/lib/store";
+import type { ServiceItem } from "@/lib/store";
 
 export default function AdminServices() {
-  const [services, setServices] = useState<ServiceItem[]>(initialServices);
+  const [services, setServices] = useState<ServiceItem[]>(getServices());
 
   const handleAddService = () => {
     const serviceName = window.prompt("Service name", "County Service");
@@ -30,16 +17,13 @@ export default function AdminServices() {
 
     const departmentName = window.prompt("Owning department", "General Administration") ?? "General Administration";
 
-    setServices((currentServices: ServiceItem[]) => [
-      ...currentServices,
-      {
-        id: Date.now(),
-        name: serviceName,
-        department: departmentName,
-        fee: "Variable",
-        status: "Draft",
-      },
-    ]);
+    addService({
+      name: serviceName,
+      department: departmentName,
+      fee: "Variable",
+      status: "Draft",
+    });
+    setServices(getServices());
   };
 
   const handleEditService = (serviceId: number) => {
@@ -55,7 +39,8 @@ export default function AdminServices() {
       return;
     }
 
-    setServices((currentServices: ServiceItem[]) => currentServices.map((service: ServiceItem) => service.id === serviceId ? { ...service, name: updatedName } : service));
+    updateService(serviceId, { name: updatedName });
+    setServices(getServices());
   };
 
   const handleDeleteService = (serviceId: number) => {
@@ -71,7 +56,8 @@ export default function AdminServices() {
       return;
     }
 
-    setServices((currentServices: ServiceItem[]) => currentServices.filter((service: ServiceItem) => service.id !== serviceId));
+    removeService(serviceId);
+    setServices(getServices());
   };
 
   return (

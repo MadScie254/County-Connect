@@ -1,11 +1,13 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Users, Heart, Wallet, CheckCircle2, Clock, MapPin, Search } from "lucide-react";
-import { motion } from "motion/react";
 import { useState } from "react";
+import { getWelfarePrograms } from "@/lib/store";
+import { motion } from "motion/react";
 
 export default function SocialWelfare() {
   const [statusMessage, setStatusMessage] = useState("");
   const [showOffices, setShowOffices] = useState(false);
+  const [programs] = useState(getWelfarePrograms());
 
   const handleEligibilityCheck = () => {
     setStatusMessage("Eligibility pre-check started. Your household profile is being matched.");
@@ -78,11 +80,7 @@ export default function SocialWelfare() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {[
-                  { name: "Elderly Cash Transfer (Inua Jamii)", status: "Enrolled", date: "May 01, 2026", method: "Biometric" },
-                  { name: "OVC Support Program", status: "Waitlist", date: "-", method: "Pending" },
-                  { name: "PWD Disability Grant", status: "Active", date: "April 15, 2026", method: "Biometric" },
-                ].map((p, i) => (
+                {programs.map((p, i) => (
                   <tr key={i} className="hover:bg-gray-50 transition">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <p className="text-sm font-bold text-gray-900">{p.name}</p>
