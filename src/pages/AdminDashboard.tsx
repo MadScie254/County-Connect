@@ -26,7 +26,7 @@ import {
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { getSelectedCounty } from "@/lib/counties";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { getApplications, getTenders, getRevenueEntries } from "@/lib/store";
 
 const revenueData = [
