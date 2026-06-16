@@ -23,7 +23,7 @@ export default function ApiHub() {
       <div className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tighttracking-tight">County Interoperability Hub</h2>
+            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">County Interoperability Hub</h2>
             <p className="text-gray-500 italic">Central middleware connecting eCitizen, KRA, NTSA, and National ID databases.</p>
           </div>
           <div className="flex items-center gap-3">
