@@ -1,6 +1,6 @@
 import { ShieldCheck, Mail, Lock, ArrowRight, Loader2, Building2 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { useState, type FormEvent } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useState, type FormEvent } from "react";
 import {
   COUNTY_PROFILES,
   getCountyBySlug,
@@ -11,10 +11,20 @@ import {
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
-  const [role, setRole] = useState<"citizen" | "admin">("citizen");
+  const [role, setRole] = useState<"citizen" | "admin">(
+    searchParams.get("role") === "admin" ? "admin" : "citizen",
+  );
   const [countySlug, setCountySlug] = useState(getSelectedCountySlug());
   const selectedCounty = getCountyBySlug(countySlug) ?? getDefaultCounty();
+
+  useEffect(() => {
+    const requestedRole = searchParams.get("role");
+    if (requestedRole === "admin" || requestedRole === "citizen") {
+      setRole(requestedRole);
+    }
+  }, [searchParams]);
 
   const handleLogin = (e: FormEvent) => {
     e.preventDefault();
@@ -29,6 +39,11 @@ export default function Login() {
         navigate(`/dashboard?county=${selectedCounty.slug}`);
       }
     }, 1500);
+  };
+
+  const handleProviderLogin = (provider: "google" | "ecitizen") => {
+    setSelectedCounty(selectedCounty.slug);
+    navigate(`/${role === "admin" ? "admin" : "dashboard"}?county=${selectedCounty.slug}&auth=${provider}`);
   };
 
   return (
@@ -55,6 +70,7 @@ export default function Login() {
           <div className="flex justify-center mb-6">
             <div className="bg-gray-100 p-1 rounded-lg flex">
               <button
+                type="button"
                 onClick={() => setRole("citizen")}
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
                   role === "citizen"
@@ -65,6 +81,7 @@ export default function Login() {
                 Citizen
               </button>
               <button
+                type="button"
                 onClick={() => setRole("admin")}
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
                   role === "admin"
@@ -163,7 +180,7 @@ export default function Login() {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-emerald-600 hover:text-emerald-500">
+                <a href="mailto:support@countyconnect.go.ke?subject=Password%20Reset" className="font-medium text-emerald-600 hover:text-emerald-500">
                   Forgot your password?
                 </a>
               </div>
@@ -204,6 +221,10 @@ export default function Login() {
               <div>
                 <a
                   href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleProviderLogin("google");
+                  }}
                   className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                 >
                   <span className="sr-only">Sign in with Google</span>
@@ -215,6 +236,10 @@ export default function Login() {
               <div>
                 <a
                   href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleProviderLogin("ecitizen");
+                  }}
                   className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                 >
                   <span className="sr-only">Sign in with eCitizen</span>

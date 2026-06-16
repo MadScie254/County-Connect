@@ -25,6 +25,7 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { getSelectedCounty } from "@/lib/counties";
+import { CURRENT_CITIZEN } from "@/lib/profile";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -120,14 +121,14 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
                     </p>
                     <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 border border-gray-100">
                       <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs">
-                        {role === "admin" ? "AD" : "JD"}
+                          {role === "admin" ? "AD" : CURRENT_CITIZEN.initials}
                       </div>
                       <div className="overflow-hidden">
                         <p className="text-sm font-medium truncate">
-                          {role === "admin" ? "Admin User" : "John Doe"}
+                            {role === "admin" ? "Admin User" : CURRENT_CITIZEN.fullName}
                         </p>
                         <p className="text-xs text-gray-500 truncate">
-                          {role === "admin" ? `admin@${selectedCounty.slug}.go.ke` : "john@example.com"}
+                            {role === "admin" ? `admin@${selectedCounty.slug}.go.ke` : CURRENT_CITIZEN.email}
                         </p>
                       </div>
                     </div>

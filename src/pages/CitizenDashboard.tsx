@@ -3,6 +3,7 @@ import { ArrowUpRight, Clock, FileCheck, AlertCircle, Plus, Building2, Globe, Ca
 import { Link } from "react-router-dom";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { getSelectedCounty } from "@/lib/counties";
+import { CURRENT_CITIZEN } from "@/lib/profile";
 
 // Mock Data
 const applications = [
@@ -47,7 +48,7 @@ export default function CitizenDashboard() {
         {/* Welcome Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Welcome back, John!</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Welcome back, {CURRENT_CITIZEN.firstName}!</h2>
             <p className="text-gray-500">Here's what's happening with your applications in {selectedCounty.name}.</p>
           </div>
           <Link
@@ -130,7 +131,7 @@ export default function CitizenDashboard() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-gray-400 hover:text-gray-600 font-medium">Details</button>
+                      <Link to="/applications" className="text-gray-400 hover:text-gray-600 font-medium">Details</Link>
                     </td>
                   </tr>
                 ))}

@@ -39,13 +39,13 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center gap-4">
               <Link
-                to="/login"
+                to="/login?role=citizen"
                 className="text-sm font-medium text-gray-600 hover:text-gray-900 hidden sm:block"
               >
                 Citizen Login
               </Link>
               <Link
-                to="/login"
+                to="/login?role=admin"
                 className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-full text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm hover:shadow-md"
               >
                 Admin Portal
@@ -77,14 +77,14 @@ export default function LandingPage() {
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
-                  to="/login"
+                  to="/login?role=citizen"
                   className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-lg hover:shadow-emerald-500/30"
                 >
                   Access Services
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Link>
                 <Link
-                  to="/login"
+                  to="/login?role=admin"
                   className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-gray-200 text-base font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 transition-all"
                 >
                   Government Login
