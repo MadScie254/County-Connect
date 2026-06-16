@@ -5,31 +5,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { getSelectedCounty } from "@/lib/counties";
 import { CURRENT_CITIZEN } from "@/lib/profile";
 
-// Mock Data
-const applications = [
-  {
-    id: "APP-2024-001",
-    service: "Single Business Permit",
-    status: "Approved",
-    date: "2024-02-15",
-    amount: 15000,
-  },
-  {
-    id: "APP-2024-002",
-    service: "Land Rates Payment",
-    status: "Pending",
-    date: "2024-02-18",
-    amount: 5000,
-  },
-  {
-    id: "APP-2024-003",
-    service: "Construction Permit",
-    status: "Rejected",
-    date: "2024-01-20",
-    amount: 25000,
-  },
-];
-
+import { getApplications } from "@/lib/store";
 const services = [
   { name: "Business Licensing", icon: Store, desc: "Apply for or renew Single Business Permits", link: "/apply/sbp" },
   { name: "Land Registry", icon: Globe, desc: "Search parcels and verify ownership chains", link: "/land-registry" },
@@ -41,6 +17,12 @@ const services = [
 
 export default function CitizenDashboard() {
   const selectedCounty = getSelectedCounty();
+  const allApplications = getApplications().filter((app) => app.applicantId === CURRENT_CITIZEN.idNumber);
+  const recentApplications = allApplications.slice(0, 3);
+  
+  const inProgressCount = allApplications.filter((app) => app.status === "Pending Review").length;
+  const approvedCount = allApplications.filter((app) => app.status === "Approved").length;
+  const pendingActionsCount = allApplications.filter((app) => app.status === "Changes Requested").length;
 
   return (
     <DashboardLayout role="citizen">
@@ -69,7 +51,7 @@ export default function CitizenDashboard() {
                 <Clock className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-gray-900">2</div>
+            <div className="text-2xl font-bold text-gray-900">{inProgressCount}</div>
             <p className="text-xs text-gray-500 mt-1">In progress</p>
           </div>
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
@@ -79,7 +61,7 @@ export default function CitizenDashboard() {
                 <FileCheck className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-gray-900">12</div>
+            <div className="text-2xl font-bold text-gray-900">{approvedCount}</div>
             <p className="text-xs text-gray-500 mt-1">Total approved permits</p>
           </div>
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
@@ -89,7 +71,7 @@ export default function CitizenDashboard() {
                 <AlertCircle className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-gray-900">1</div>
+            <div className="text-2xl font-bold text-gray-900">{pendingActionsCount}</div>
             <p className="text-xs text-gray-500 mt-1">Requires your attention</p>
           </div>
         </div>
@@ -115,7 +97,7 @@ export default function CitizenDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {applications.map((app) => (
+                {recentApplications.map((app) => (
                   <tr key={app.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 font-medium text-gray-900">{app.id}</td>
                     <td className="px-6 py-4 text-gray-600">{app.service}</td>
@@ -124,7 +106,8 @@ export default function CitizenDashboard() {
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                         app.status === 'Approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                        app.status === 'Pending' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                        app.status === 'Pending Review' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                        app.status === 'Changes Requested' ? 'bg-amber-50 text-amber-700 border-amber-100' :
                         'bg-red-50 text-red-700 border-red-100'
                       }`}>
                         {app.status}

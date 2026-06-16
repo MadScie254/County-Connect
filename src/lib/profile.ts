@@ -1,3 +1,5 @@
+import { KENYAN_CITIZEN_NAMES, generateEmail, generatePhone } from "./names";
+
 export interface CitizenProfile {
   fullName: string;
   firstName: string;
@@ -11,14 +13,16 @@ export interface CitizenProfile {
   ward: string;
 }
 
+const defaultCitizen = KENYAN_CITIZEN_NAMES[0];
+
 export const CURRENT_CITIZEN: CitizenProfile = {
-  fullName: "Daniel Wanjala Machimbo",
-  firstName: "Daniel",
-  lastName: "Wanjala Machimbo",
-  initials: "DWM",
-  email: "daniel.wanjala@county.go.ke",
-  phone: "0712 345 678",
-  idNumber: "12345678",
+  fullName: `${defaultCitizen.first} ${defaultCitizen.last}`,
+  firstName: defaultCitizen.first,
+  lastName: defaultCitizen.last,
+  initials: `${defaultCitizen.first[0]}${defaultCitizen.last[0]}`,
+  email: generateEmail(defaultCitizen.first, defaultCitizen.last),
+  phone: generatePhone(),
+  idNumber: defaultCitizen.id,
   address: "P.O. Box 12345, Nairobi",
   county: "Nairobi City County",
   ward: "Kilimani",

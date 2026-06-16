@@ -25,8 +25,9 @@ import {
 } from "recharts";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
-import { cn } from "@/lib/utils";
 import { getSelectedCounty } from "@/lib/counties";
+import { formatCurrency } from "@/lib/utils";
+import { getApplications, getTenders, getRevenueEntries } from "@/lib/store";
 
 const revenueData = [
   { name: "Mon", amount: 2.1 },
@@ -40,6 +41,16 @@ const revenueData = [
 
 export default function AdminDashboard() {
   const selectedCounty = getSelectedCounty();
+  
+  const applications = getApplications();
+  const tenders = getTenders();
+  const revenues = getRevenueEntries();
+
+  const pendingApprovals = applications.filter(a => a.status === "Pending Review").length;
+  const activeTenders = tenders.filter(t => t.status === "Open" || t.status === "Evaluated").length;
+  const totalRevenue = revenues.reduce((acc, r) => acc + r.amount, 0);
+
+  const urgentQueue = applications.filter(a => a.status === "Pending Review").slice(0, 5);
 
   return (
     <DashboardLayout role="admin">
@@ -64,9 +75,9 @@ export default function AdminDashboard() {
         {/* Global Executive KPIs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: "Daily Revenue", value: "KES 5.2M", change: "+12.5%", trending: "up", icon: Coins, color: "text-emerald-600", bg: "bg-emerald-50" },
-            { label: "Pending Approvals", value: "124", change: "-8", trending: "down", icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
-            { label: "Active Tenders", value: "42", change: "+4", trending: "up", icon: Briefcase, color: "text-orange-600", bg: "bg-orange-50" },
+            { label: "Total Revenue", value: formatCurrency(totalRevenue), change: "+12.5%", trending: "up", icon: Coins, color: "text-emerald-600", bg: "bg-emerald-50" },
+            { label: "Pending Approvals", value: pendingApprovals.toString(), change: "+3", trending: "up", icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
+            { label: "Active Tenders", value: activeTenders.toString(), change: "0", trending: "up", icon: Briefcase, color: "text-orange-600", bg: "bg-orange-50" },
             { label: "Compliance Rate", value: "94.2%", change: "+0.5%", trending: "up", icon: ShieldCheck, color: "text-purple-600", bg: "bg-purple-50" },
           ].map((stat, i) => (
             <motion.div
@@ -143,7 +154,7 @@ export default function AdminDashboard() {
                </div>
                <div>
                   <h4 className="font-black text-gray-900 italic text-sm uppercase">Procurement</h4>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">42 Active Tenders</p>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{activeTenders} Active Tenders</p>
                </div>
             </Link>
             <Link to="/admin/revenue" className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition cursor-pointer group flex flex-col justify-between">
@@ -194,37 +205,31 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {[
-                  { name: "Apex Logistics Ltd", service: "Single Business Permit", value: "KES 42,500", sla: "2h remaining", type: "business" },
-                  { name: "John Maina", service: "Land Registry Search", value: "KES 500", sla: "45m remaining", type: "citizen" },
-                  { name: "Green Valley Farms", service: "Liquor License Renewal", value: "KES 50,000", sla: "OVERDUE", type: "business" },
-                ].map((app, i) => (
-                  <tr key={i} className="hover:bg-emerald-50/30 transition group">
+                {urgentQueue.map((app) => (
+                  <tr key={app.id} className="hover:bg-emerald-50/30 transition group">
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
                          <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold", 
                             app.type === 'business' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
                          )}>
-                            {app.name.charAt(0)}
+                            {app.applicant.charAt(0)}
                          </div>
-                         <p className="text-sm font-bold text-gray-900">{app.name}</p>
+                         <p className="text-sm font-bold text-gray-900">{app.applicant}</p>
                       </div>
                     </td>
                     <td className="px-8 py-5">
                        <p className="text-xs font-bold text-gray-500 uppercase">{app.service}</p>
                     </td>
                     <td className="px-8 py-5">
-                       <p className="text-sm font-black text-gray-900">{app.value}</p>
+                       <p className="text-sm font-black text-gray-900">{formatCurrency(app.amount)}</p>
                     </td>
                     <td className="px-8 py-5">
-                       <span className={cn("inline-flex px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter",
-                          app.sla === 'OVERDUE' ? 'bg-red-100 text-red-700 animate-pulse' : 'bg-blue-100 text-blue-700'
-                       )}>
-                          {app.sla}
+                       <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-amber-100 text-amber-700">
+                          {app.status}
                        </span>
                     </td>
                     <td className="px-8 py-5 text-right">
-                        <Link to="/admin/applications/APP-2024-001" aria-label="Open application details" className="inline-flex px-4 py-1.5 bg-gray-50 text-gray-400 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition shadow-none hover:shadow-lg hover:shadow-emerald-200">
+                        <Link to={`/admin/applications/${app.id}`} aria-label="Open application details" className="inline-flex px-4 py-1.5 bg-gray-50 text-gray-400 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition shadow-none hover:shadow-lg hover:shadow-emerald-200">
                           <span className="sr-only">Open application details</span>
                           <ArrowUpRight className="w-4 h-4" />
                         </Link>
