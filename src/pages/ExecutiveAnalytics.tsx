@@ -2,6 +2,8 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { BarChart3, TrendingUp, TrendingDown, Target, Zap, Globe, Map as MapIcon, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { getApplications, getTenders, getRevenueEntries, getAnomalies } from "@/lib/store";
+import { formatCurrency } from "@/lib/utils";
 import { 
   BarChart, 
   Bar, 
@@ -35,6 +37,12 @@ const sectorData = [
 
 export default function ExecutiveAnalytics() {
    const [viewScope, setViewScope] = useState<"regional" | "county">("regional");
+   const apps = getApplications();
+   const tenders = getTenders();
+   const revenue = getRevenueEntries();
+   const anomalies = getAnomalies();
+   const totalRevenue = revenue.reduce((s, r) => s + r.amount, 0);
+   const approvedPct = apps.length ? Math.round((apps.filter(a => a.status === "Approved").length / apps.length) * 100 * 10) / 10 : 0;
 
   return (
     <DashboardLayout role="admin">
@@ -60,8 +68,8 @@ export default function ExecutiveAnalytics() {
         {/* Global KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Service Efficiency</p>
-              <h3 className="text-4xl font-black text-gray-900 leading-none">94.2%</h3>
+               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Service Efficiency</p>
+               <h3 className="text-4xl font-black text-gray-900 leading-none">{approvedPct}%</h3>
               <p className="text-xs font-bold text-emerald-600 mt-2 flex items-center gap-1 leading-none">
                  <TrendingUp className="w-3 h-3" /> +4.2% Since Jan
               </p>
@@ -75,7 +83,7 @@ export default function ExecutiveAnalytics() {
            </div>
            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group">
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Revenue Variance</p>
-              <h3 className="text-4xl font-black text-emerald-600 leading-none">+KES 120M</h3>
+               <h3 className="text-4xl font-black text-emerald-600 leading-none">+{formatCurrency(totalRevenue)}</h3>
               <p className="text-xs font-bold text-emerald-600 mt-2 flex items-center gap-1 leading-none italic font-serif">
                  Surplus Projection
               </p>

@@ -24,6 +24,7 @@ import ApiHub from "@/pages/ApiHub";
 import ExecutiveAnalytics from "@/pages/ExecutiveAnalytics";
 import PublicHealth from "@/pages/PublicHealth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { LiveAlerts } from "@/components/LiveAlerts";
 import { initializeStore } from "@/lib/store";
 
 export default function App() {
@@ -68,6 +69,7 @@ export default function App() {
         <Route path="/payments" element={<Navigate to="/dashboard" />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <LiveAlerts />
     </BrowserRouter>
   );
 }
