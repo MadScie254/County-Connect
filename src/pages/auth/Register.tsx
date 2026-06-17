@@ -37,7 +37,7 @@ export default function Register() {
           data: {
             full_name: `${firstName} ${lastName}`,
             phone,
-            role: "citizen" // Default to citizen on registration
+            role: "citizen"
           }
         }
       });
