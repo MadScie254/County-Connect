@@ -1,6 +1,7 @@
+import { startLiveSimulation, stopLiveSimulation, subscribe } from "@/lib/store";
 import { useEffect, useState, useCallback } from "react";
 import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 import { CheckCircle2, AlertTriangle, Info, X } from "lucide-react";
 

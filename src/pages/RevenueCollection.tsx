@@ -1,9 +1,10 @@
+import { getRevenueEntries, subscribe } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Coins, Smartphone, TrendingUp, AlertCircle, BarChart3, Search, Filter } from "lucide-react";
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
 import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 

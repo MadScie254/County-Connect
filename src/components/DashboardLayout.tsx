@@ -28,7 +28,7 @@ import { getSelectedCounty } from "@/lib/counties";
 import { CURRENT_CITIZEN } from "@/lib/profile";
 import { logout } from "@/lib/auth";
 import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 
 interface DashboardLayoutProps {

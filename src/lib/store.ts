@@ -1,8 +1,9 @@
+import { getApplications, getTenders, getRevenueEntries, getAnomalies, getLandRecords, getPetitions, getWelfarePrograms, getHealthDrugs, getNotifications, getDepartments, getServices, getApplicationById, getUnreadCount } from "@/lib/store";
 import { useSupabase } from "@/hooks/useSupabase";
 import type { 
   Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, 
   Petition, WelfareProgram, HealthDrugItem, Notification, 
-  Department, ServiceItem 
+  Department,  
 } from "./types";
 
 export * from "./types";
@@ -19,7 +20,7 @@ export function getWelfarePrograms() { return useSupabase<WelfareProgram>("welfa
 export function getHealthDrugs() { return useSupabase<HealthDrugItem>("health_drugs").data; }
 export function getNotifications() { return useSupabase<Notification>("notifications").data; }
 export function getDepartments() { return useSupabase<Department>("departments").data; }
-export function getServices() { return useSupabase<ServiceItem>("services").data; }
+export function getServices() { return useSupabase<>("services").data; }
 
 export function getApplicationById(id: string) {
   // Simple implementation, component will re-render

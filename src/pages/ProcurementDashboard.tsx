@@ -1,3 +1,4 @@
+import { getTenders } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { 
   BarChart, 
@@ -15,7 +16,7 @@ import { Search, Filter, AlertTriangle, CheckCircle2, Building2, FileText, Trend
 import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
 import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 const awardDistribution = [
   { name: "Mega Corp Ltd", value: 12 },

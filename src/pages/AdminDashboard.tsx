@@ -1,3 +1,4 @@
+import { getApplications, getRevenueEntries } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { 
   Users, 
@@ -28,7 +29,7 @@ import { motion } from "motion/react";
 import { getSelectedCounty } from "@/lib/counties";
 import { formatCurrency, cn } from "@/lib/utils";
 import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 
 const revenueData = [

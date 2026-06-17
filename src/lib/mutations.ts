@@ -1,6 +1,7 @@
+import { addApplication, updateApplicationStatus, addRevenueEntry, addDepartment, addService, updateService, removeService, votePetition, markAllNotificationsRead, updateDrugStock, startLiveSimulation, stopLiveSimulation, subscribe } from "@/lib/store";
 
 import { supabase } from "./supabase";
-import type { Application, Tender, Department, ServiceItem, Petition, HealthDrugItem } from "./types";
+import type { Application, Tender, Department,  Petition, HealthDrugItem } from "./types";
 
 export async function addApplication(app: Partial<Application>) {
   const newApp = { ...app, id: `APP-2026-${Math.floor(Math.random() * 1000).toString().padStart(3, "0")}`, date: new Date().toISOString().split("T")[0], status: "Pending Review" };
@@ -20,11 +21,11 @@ export async function addDepartment(dept: Partial<Department>) {
   await supabase.from('departments').insert(dept);
 }
 
-export async function addService(svc: Partial<ServiceItem>) {
+export async function addService(svc: Partial<>) {
   await supabase.from('services').insert(svc);
 }
 
-export async function updateService(id: number, updates: Partial<ServiceItem>) {
+export async function updateService(id: number, updates: Partial<>) {
   await supabase.from('services').update(updates).eq('id', id);
 }
 

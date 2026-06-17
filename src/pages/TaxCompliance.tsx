@@ -1,3 +1,4 @@
+import { addRevenueEntry } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { 
   Calculator, 
@@ -14,7 +15,7 @@ import {
 import { useState } from "react";
 import { motion } from "motion/react";
 import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 import { CURRENT_CITIZEN } from "@/lib/profile";
 

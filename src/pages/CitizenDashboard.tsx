@@ -1,3 +1,4 @@
+import { getApplications } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ArrowUpRight, Clock, FileCheck, AlertCircle, Plus, Building2, Globe, Car, HardHat, Coins, HeartPulse, MessageSquare, Store } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -6,7 +7,7 @@ import { getSelectedCounty } from "@/lib/counties";
 import { CURRENT_CITIZEN } from "@/lib/profile";
 
 import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 const services = [
   { name: "Business Licensing", icon: Store, desc: "Apply for or renew Single Business Permits", link: "/apply/sbp" },

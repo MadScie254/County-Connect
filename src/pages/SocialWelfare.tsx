@@ -1,8 +1,9 @@
+import { getWelfarePrograms } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Users, Heart, Wallet, CheckCircle2, Clock, MapPin, Search } from "lucide-react";
 import { useState } from "react";
 import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 import { motion } from "motion/react";
 

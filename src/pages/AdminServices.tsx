@@ -3,12 +3,12 @@ import { Plus, Edit, Trash2, Search } from "lucide-react";
 import { useState } from "react";
 
 import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
-import type { ServiceItem } from "@/lib/store";
+import type {  } from "@/lib/store";
 
 export default function AdminServices() {
-  const [services, setServices] = useState<ServiceItem[]>(getServices());
+  const [services, setServices] = useState<[]>(getServices());
 
   const handleAddService = () => {
     const serviceName = window.prompt("Service name", "County Service");
@@ -29,7 +29,7 @@ export default function AdminServices() {
   };
 
   const handleEditService = (serviceId: number) => {
-    const currentService = services.find((service: ServiceItem) => service.id === serviceId);
+    const currentService = services.find((service: ) => service.id === serviceId);
 
     if (!currentService) {
       return;
@@ -46,7 +46,7 @@ export default function AdminServices() {
   };
 
   const handleDeleteService = (serviceId: number) => {
-    const currentService = services.find((service: ServiceItem) => service.id === serviceId);
+    const currentService = services.find((service: ) => service.id === serviceId);
 
     if (!currentService) {
       return;
@@ -97,7 +97,7 @@ export default function AdminServices() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {services.map((service: ServiceItem) => (
+              {services.map((service: ) => (
                 <tr key={service.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 font-medium text-gray-900">{service.name}</td>
                   <td className="px-6 py-4 text-gray-600">{service.department}</td>

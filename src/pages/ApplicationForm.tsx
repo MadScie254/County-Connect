@@ -1,3 +1,4 @@
+import { addApplication, addRevenueEntry } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -6,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { CURRENT_CITIZEN } from "@/lib/profile";
 import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 
 const steps = [
