@@ -2,6 +2,7 @@
 // Replaces all hardcoded mock data throughout the app
 
 import { KENYAN_CITIZEN_NAMES, KENYAN_COMPANIES, DEPARTMENT_HEADS, generatePhone, generateEmail } from "./names";
+import { supabase } from "./supabase";
 
 // ─── Types ───────────────────────────────────────────────────────────
 export interface Application {
@@ -369,6 +370,33 @@ export function initializeStore() {
   if (!getStore("petitions")) setStore("petitions", seedPetitions());
   if (!getStore("land-records")) setStore("land-records", seedLandRecords());
   if (!getStore("anomalies")) setStore("anomalies", seedAnomalies());
+
+  // Async sync from Supabase
+  syncSupabaseData();
+}
+
+async function syncSupabaseData() {
+  try {
+    const { data: apps } = await supabase.from('applications').select('*');
+    if (apps && apps.length > 0) {
+      // Map back to local schema
+      const mappedApps = apps.map(a => ({
+        ...a,
+        applicantId: a.applicant_id,
+        applicantEmail: a.applicant_email,
+        applicantPhone: a.applicant_phone,
+        businessName: a.business_name,
+        subCounty: a.sub_county,
+      }));
+      setStore("applications", mappedApps);
+    }
+    const { data: svcs } = await supabase.from('services').select('*');
+    if (svcs && svcs.length > 0) {
+      setStore("services", svcs);
+    }
+  } catch (err) {
+    console.error("Supabase sync failed:", err);
+  }
 }
 
 // ─── CRUD Operations ─────────────────────────────────────────────────
@@ -398,6 +426,25 @@ export function addApplication(app: Omit<Application, "id" | "date" | "status">)
     message: `Your ${newApp.service} application (${newApp.id}) has been submitted successfully.`,
     type: "success",
   });
+  
+  // Async push to Supabase
+  supabase.from('applications').insert({
+    id: newApp.id,
+    applicant: newApp.applicant,
+    applicant_id: newApp.applicantId,
+    applicant_email: newApp.applicantEmail,
+    applicant_phone: newApp.applicantPhone,
+    service: newApp.service,
+    date: newApp.date,
+    status: newApp.status,
+    amount: newApp.amount,
+    business_name: newApp.businessName,
+    ward: newApp.ward,
+    sub_county: newApp.subCounty,
+    address: newApp.address,
+    type: newApp.type
+  }).then(({error}) => { if (error) console.error("Failed to insert app:", error); });
+
   return newApp;
 }
 
@@ -413,6 +460,10 @@ export function updateApplicationStatus(id: string, status: Application["status"
       message: `Application ${id} has been ${status.toLowerCase()}.`,
       type: status === "Approved" ? "success" : status === "Rejected" ? "error" : "info",
     });
+
+    // Async push to Supabase
+    supabase.from('applications').update({ status }).eq('id', id)
+      .then(({error}) => { if (error) console.error("Failed to update app status:", error); });
   }
 }
 
@@ -478,6 +529,16 @@ export function addService(svc: Omit<ServiceItem, "id">) {
   const newSvc: ServiceItem = { ...svc, id: Date.now() };
   svcs.push(newSvc);
   setStore("services", svcs);
+
+  // Async push to Supabase
+  supabase.from('services').insert({
+    id: newSvc.id,
+    name: newSvc.name,
+    department: newSvc.department,
+    fee: newSvc.fee,
+    status: newSvc.status
+  }).then(({error}) => { if (error) console.error("Failed to insert service:", error); });
+
   return newSvc;
 }
 
@@ -487,6 +548,14 @@ export function updateService(id: number, updates: Partial<ServiceItem>) {
   if (idx !== -1) {
     svcs[idx] = { ...svcs[idx], ...updates };
     setStore("services", svcs);
+
+    // Async push to Supabase
+    supabase.from('services').update({
+      name: svcs[idx].name,
+      department: svcs[idx].department,
+      fee: svcs[idx].fee,
+      status: svcs[idx].status
+    }).eq('id', id).then(({error}) => { if (error) console.error("Failed to update service:", error); });
   }
 }
 
