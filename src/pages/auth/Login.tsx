@@ -9,6 +9,7 @@ import {
   setSelectedCounty,
 } from "@/lib/counties";
 import { login } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -27,28 +28,45 @@ export default function Login() {
     }
   }, [searchParams]);
 
-  const handleLogin = (e: FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setSelectedCounty(selectedCounty.slug);
     
-    // Perform actual login
-    login({
-      role,
-      countySlug: selectedCounty.slug,
-      name: "Test User", // Ideally fetched from form
-      email: "test@example.com",
-    });
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Perform actual login with Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // Also set the local session for legacy compatibility with the mock data store
+      login({
+        role,
+        countySlug: selectedCounty.slug,
+        name: data.user?.user_metadata?.full_name || "Authenticated User",
+        email: data.user?.email || email,
+      });
+
       if (role === "admin") {
         navigate(`/admin`);
       } else {
         navigate(`/dashboard`);
       }
-    }, 1500);
+    } catch (err: any) {
+      console.error("Login error:", err.message);
+      alert(err.message || "Failed to sign in. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleProviderLogin = (provider: "google" | "ecitizen") => {
