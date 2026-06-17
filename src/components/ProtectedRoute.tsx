@@ -11,6 +11,7 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
   const [session, setSession] = useState<any>(null);
   const [userRole, setUserRole] = useState<string>("citizen");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
