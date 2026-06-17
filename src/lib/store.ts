@@ -379,7 +379,6 @@ async function syncSupabaseData() {
   try {
     const { data: apps } = await supabase.from('applications').select('*');
     if (apps && apps.length > 0) {
-      // Map back to local schema
       const mappedApps = apps.map(a => ({
         ...a,
         applicantId: a.applicant_id,
@@ -391,9 +390,40 @@ async function syncSupabaseData() {
       setStore("applications", mappedApps);
     }
     const { data: svcs } = await supabase.from('services').select('*');
-    if (svcs && svcs.length > 0) {
-      setStore("services", svcs);
+    if (svcs && svcs.length > 0) setStore("services", svcs);
+
+    const { data: tndrs } = await supabase.from('tenders').select('*');
+    if (tndrs && tndrs.length > 0) {
+      const mappedTndrs = tndrs.map(t => ({ ...t, awardedTo: t.awarded_to }));
+      setStore("tenders", mappedTndrs);
     }
+
+    const { data: depts } = await supabase.from('departments').select('*');
+    if (depts && depts.length > 0) setStore("departments", depts);
+
+    const { data: notifs } = await supabase.from('notifications').select('*');
+    if (notifs && notifs.length > 0) setStore("notifications", notifs);
+
+    const { data: revs } = await supabase.from('revenue').select('*');
+    if (revs && revs.length > 0) setStore("revenue", revs);
+
+    const { data: drugs } = await supabase.from('health_drugs').select('*');
+    if (drugs && drugs.length > 0) setStore("health-drugs", drugs);
+
+    const { data: welf } = await supabase.from('welfare').select('*');
+    if (welf && welf.length > 0) setStore("welfare", welf);
+
+    const { data: pets } = await supabase.from('petitions').select('*');
+    if (pets && pets.length > 0) {
+      const mappedPets = pets.map(p => ({ ...p, totalNeeded: p.total_needed }));
+      setStore("petitions", mappedPets);
+    }
+
+    const { data: lands } = await supabase.from('land_records').select('*');
+    if (lands && lands.length > 0) setStore("land-records", lands);
+
+    const { data: anom } = await supabase.from('anomalies').select('*');
+    if (anom && anom.length > 0) setStore("anomalies", anom);
   } catch (err) {
     console.error("Supabase sync failed:", err);
   }
@@ -481,6 +511,17 @@ export function addTender(tender: Omit<Tender, "id">) {
   tenders.unshift(newTender);
   setStore("tenders", tenders);
   emit("tender:created", newTender);
+
+  supabase.from('tenders').insert({
+    id: newTender.id,
+    title: newTender.title,
+    entity: newTender.entity,
+    value: newTender.value,
+    status: newTender.status,
+    deadline: newTender.deadline,
+    awarded_to: newTender.awardedTo
+  }).then(({error}) => { if (error) console.error("Failed to insert tender:", error); });
+
   return newTender;
 }
 
@@ -501,6 +542,14 @@ export function addDepartment(dept: Omit<Department, "id">) {
   depts.push(newDept);
   setStore("departments", depts);
   emit("department:created", newDept);
+
+  supabase.from('departments').insert({
+    name: newDept.name,
+    head: newDept.head,
+    staff: newDept.staff,
+    services: newDept.services
+  }).then(({error}) => { if (error) console.error("Failed to insert dept:", error); });
+
   return newDept;
 }
 
@@ -510,6 +559,13 @@ export function updateDepartment(id: number, updates: Partial<Department>) {
   if (idx !== -1) {
     depts[idx] = { ...depts[idx], ...updates };
     setStore("departments", depts);
+
+    supabase.from('departments').update({
+      name: depts[idx].name,
+      head: depts[idx].head,
+      staff: depts[idx].staff,
+      services: depts[idx].services
+    }).eq('id', id).then(({error}) => { if (error) console.error("Failed to update dept:", error); });
   }
 }
 
@@ -580,6 +636,15 @@ export function addNotification(notif: Omit<Notification, "id" | "date" | "read"
   notifs.unshift(newNotif);
   setStore("notifications", notifs);
   emit("notification:new", newNotif);
+
+  supabase.from('notifications').insert({
+    title: newNotif.title,
+    message: newNotif.message,
+    type: newNotif.type,
+    date: newNotif.date,
+    read: newNotif.read
+  }).then(({error}) => { if (error) console.error("Failed to insert notif:", error); });
+
   return newNotif;
 }
 
@@ -612,6 +677,17 @@ export function addRevenueEntry(entry: Omit<RevenueEntry, "id">) {
   entries.unshift(newEntry);
   setStore("revenue", entries);
   emit("revenue:new", newEntry);
+
+  supabase.from('revenue').insert({
+    id: newEntry.id,
+    ref: newEntry.ref,
+    amount: newEntry.amount,
+    "user": newEntry.user,
+    stream: newEntry.stream,
+    time: newEntry.time,
+    reconciled: newEntry.reconciled
+  }).then(({error}) => { if (error) console.error("Failed to insert revenue:", error); });
+
   return newEntry;
 }
 
@@ -626,6 +702,11 @@ export function updateDrugStock(id: number, updates: Partial<HealthDrugItem>) {
   if (idx !== -1) {
     drugs[idx] = { ...drugs[idx], ...updates };
     setStore("health-drugs", drugs);
+
+    supabase.from('health_drugs').update({
+      stock: drugs[idx].stock,
+      level: drugs[idx].level
+    }).eq('id', id).then(({error}) => { if (error) console.error("Failed to update drug:", error); });
   }
 }
 
@@ -646,6 +727,10 @@ export function votePetition(id: number) {
     petitions[idx].supporters += 1;
     setStore("petitions", petitions);
     emit("petition:voted", petitions[idx]);
+
+    supabase.from('petitions').update({
+      supporters: petitions[idx].supporters
+    }).eq('id', id).then(({error}) => { if (error) console.error("Failed to update petition:", error); });
   }
 }
 
@@ -665,6 +750,9 @@ export function dismissAnomaly(id: number) {
   if (idx !== -1) {
     anomalies[idx].dismissed = true;
     setStore("anomalies", anomalies);
+
+    supabase.from('anomalies').update({ dismissed: true })
+      .eq('id', id).then(({error}) => { if (error) console.error("Failed to dismiss anomaly:", error); });
   }
 }
 
