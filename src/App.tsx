@@ -25,11 +25,11 @@ import ExecutiveAnalytics from "@/pages/ExecutiveAnalytics";
 import PublicHealth from "@/pages/PublicHealth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { LiveAlerts } from "@/components/LiveAlerts";
-import { initializeStore } from "@/lib/store";
+
 
 export default function App() {
   useEffect(() => {
-    initializeStore();
+    // Supabase will now handle all data reactively
   }, []);
 
   return (
