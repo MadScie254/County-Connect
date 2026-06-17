@@ -51,4 +51,4 @@ export async function updateDrugStock(id: number, stock: string, level: string) 
 // Stubs for live simulation
 export function startLiveSimulation() {}
 export function stopLiveSimulation() {}
-export function subscribe(event: string, callback: () => void) { return () => {}; }
+export function subscribe(event: string, callback: (data?: any) => void) { return () => {}; }
