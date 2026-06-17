@@ -1,4 +1,4 @@
-import { addApplication, updateApplicationStatus, addRevenueEntry, addDepartment, addService, updateService, removeService, votePetition, markAllNotificationsRead, updateDrugStock, startLiveSimulation, stopLiveSimulation, subscribe } from "@/lib/mutations";
+
 import { supabase } from "./supabase";
 import type { Application, Tender, Department, ServiceItem, Petition, HealthDrugItem } from "./types";
 
