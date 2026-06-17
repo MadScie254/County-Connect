@@ -27,6 +27,7 @@ export default function Register() {
     const lastName = formData.get("lastName") as string;
     const email = formData.get("email") as string;
     const phone = formData.get("phone") as string;
+    const nationalId = formData.get("nationalId") as string;
     const password = formData.get("password") as string;
 
     try {
@@ -35,8 +36,9 @@ export default function Register() {
         password,
         options: {
           data: {
-            full_name: `${firstName} ${lastName}`,
-            phone,
+            name: `${firstName} ${lastName}`,
+            national_id: nationalId,
+            phone_number: phone,
             role: "citizen"
           }
         }
@@ -168,22 +170,42 @@ export default function Register() {
               </div>
             </div>
 
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                Phone Number
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                  Phone Number
+                </label>
+                <div className="mt-1 relative rounded-md shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Phone className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    className="focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                    placeholder="07XX XXX XXX"
+                  />
                 </div>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  required
-                  className="focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
-                  placeholder="07XX XXX XXX"
-                />
+              </div>
+              <div>
+                <label htmlFor="nationalId" className="block text-sm font-medium text-gray-700">
+                  National ID
+                </label>
+                <div className="mt-1 relative rounded-md shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <ShieldCheck className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="nationalId"
+                    name="nationalId"
+                    type="text"
+                    required
+                    className="focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                    placeholder="12345678"
+                  />
+                </div>
               </div>
             </div>
 
