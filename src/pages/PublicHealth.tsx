@@ -13,7 +13,7 @@ export default function PublicHealth() {
 
    const handleRestockAll = () => {
       healthDrugs.filter(d => d.level === "critical").forEach(d => {
-         updateDrugStock(d.id, { stock: "Restocked (100 units)", level: "high" });
+         updateDrugStock(d.id, "Restocked (100 units)", "high");
       });
       setHealthDrugs(getHealthDrugs());
       setRestockMessage("Critical stock-out facilities have been queued for immediate replenishment.");
