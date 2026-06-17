@@ -9,6 +9,7 @@ import {
   setSelectedCounty,
 } from "@/lib/counties";
 import { login } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -16,23 +17,49 @@ export default function Register() {
   const [countySlug, setCountySlug] = useState(getSelectedCountySlug());
   const selectedCounty = getCountyBySlug(countySlug) ?? getDefaultCounty();
 
-  const handleRegister = (e: FormEvent) => {
+  const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setSelectedCounty(selectedCounty.slug);
     
-    login({
-      role: "citizen",
-      countySlug: selectedCounty.slug,
-      name: "New Citizen", // Should get from form but this is mock
-      email: "new@example.com",
-    });
+    const formData = new FormData(e.target as HTMLFormElement);
+    const firstName = formData.get("firstName") as string;
+    const lastName = formData.get("lastName") as string;
+    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string;
+    const password = formData.get("password") as string;
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: `${firstName} ${lastName}`,
+            phone,
+          }
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // Automatically sign in locally for legacy mock features to work
+      login({
+        role: "citizen",
+        countySlug: selectedCounty.slug,
+        name: `${firstName} ${lastName}`,
+        email: email,
+      });
+
       navigate(`/dashboard`);
-    }, 1500);
+    } catch (err: any) {
+      console.error("Registration error:", err.message);
+      alert(err.message || "Failed to create account. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

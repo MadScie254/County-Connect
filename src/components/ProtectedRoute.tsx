@@ -14,6 +14,11 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
     return <Navigate to={`/login${role === "admin" ? "?role=admin" : ""}`} replace />;
   }
 
+  if (session.email === "danielwanjalamachimbo@gmail.com") {
+    // Superuser bypasses role checks
+    return <>{children}</>;
+  }
+
   if (session.role !== role) {
     // Logged in but wrong role
     // Redirect to their respective dashboard
