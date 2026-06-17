@@ -27,7 +27,9 @@ import { motion, AnimatePresence } from "motion/react";
 import { getSelectedCounty } from "@/lib/counties";
 import { CURRENT_CITIZEN } from "@/lib/profile";
 import { logout } from "@/lib/auth";
-import { getUnreadCount } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -35,6 +37,7 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, role }: DashboardLayoutProps) {
+  const { data: notifications } = useSupabase<Notification>("notifications");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const selectedCounty = getSelectedCounty();
@@ -213,7 +216,7 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
               </div>
               <Link to="/notifications" className="relative p-2 text-gray-400 hover:text-gray-500" aria-label="Notifications">
                 <Bell className="w-5 h-5" />
-                {getUnreadCount() > 0 && (
+                {(notifications?.filter(n => !n.read).length || 0) > 0 && (
                   <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
                 )}
               </Link>

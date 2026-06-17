@@ -5,7 +5,9 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { getSelectedCounty } from "@/lib/counties";
 import { CURRENT_CITIZEN } from "@/lib/profile";
 
-import { getApplications } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 const services = [
   { name: "Business Licensing", icon: Store, desc: "Apply for or renew Single Business Permits", link: "/apply/sbp" },
   { name: "Land Registry", icon: Globe, desc: "Search parcels and verify ownership chains", link: "/land-registry" },

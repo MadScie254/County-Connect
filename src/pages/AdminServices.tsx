@@ -2,7 +2,9 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Plus, Edit, Trash2, Search } from "lucide-react";
 import { useState } from "react";
 
-import { getServices, addService, updateService, removeService } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 import type { ServiceItem } from "@/lib/store";
 
 export default function AdminServices() {

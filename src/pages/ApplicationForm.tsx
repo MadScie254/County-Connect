@@ -5,7 +5,9 @@ import { CheckCircle2, ChevronRight, Upload, CreditCard, AlertCircle } from "luc
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { CURRENT_CITIZEN } from "@/lib/profile";
-import { addApplication, addRevenueEntry } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 
 const steps = [
   { id: 1, name: "Business Details" },

@@ -3,7 +3,9 @@ import { Search, Filter, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-
 import { Link } from "react-router-dom";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useState } from "react";
-import { getApplications } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 const ITEMS_PER_PAGE = 10;
 
 export default function ApplicationsList() {

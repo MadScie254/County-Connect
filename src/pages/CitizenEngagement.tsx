@@ -1,7 +1,9 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { MessageSquare, ThumbsUp, Send, Users, FileWarning, HelpCircle } from "lucide-react";
 import { useState } from "react";
-import { getPetitions, votePetition } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 
 export default function CitizenEngagement() {
   const [statusMessage, setStatusMessage] = useState("");

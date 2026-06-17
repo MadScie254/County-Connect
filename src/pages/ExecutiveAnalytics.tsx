@@ -2,7 +2,9 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { BarChart3, TrendingUp, TrendingDown, Target, Zap, Globe, Map as MapIcon, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { getApplications, getTenders, getRevenueEntries, getAnomalies } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import { 
   BarChart, 
@@ -37,10 +39,10 @@ const sectorData = [
 
 export default function ExecutiveAnalytics() {
    const [viewScope, setViewScope] = useState<"regional" | "county">("regional");
-   const apps = getApplications();
-   const tenders = getTenders();
-   const revenue = getRevenueEntries();
-   const anomalies = getAnomalies();
+   const { data: apps } = useSupabase<Application>("applications");
+   const { data: tenders } = useSupabase<Tender>("tenders");
+   const { data: revenue } = useSupabase<RevenueEntry>("revenue");
+   const { data: anomalies } = useSupabase<AnomalyAlert>("anomalies");
    const totalRevenue = revenue.reduce((s, r) => s + r.amount, 0);
    const approvedPct = apps.length ? Math.round((apps.filter(a => a.status === "Approved").length / apps.length) * 100 * 10) / 10 : 0;
 

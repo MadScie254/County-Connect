@@ -14,7 +14,9 @@ import {
 import { Search, Filter, AlertTriangle, CheckCircle2, Building2, FileText, TrendingUp } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
-import { getTenders } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 const awardDistribution = [
   { name: "Mega Corp Ltd", value: 12 },
   { name: "BuildWell Inc", value: 8 },

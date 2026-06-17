@@ -2,7 +2,9 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Coins, Smartphone, TrendingUp, AlertCircle, BarChart3, Search, Filter } from "lucide-react";
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
-import { getRevenueEntries, subscribe } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 
 const TARGET_WIDTH_CLASSES: Record<string, string> = {

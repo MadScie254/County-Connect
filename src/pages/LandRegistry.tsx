@@ -15,14 +15,16 @@ import {
 import { useState } from "react";
 import { motion } from "motion/react";
 import { CURRENT_CITIZEN } from "@/lib/profile";
-import { getLandRecords } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 
 export default function LandRegistry() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState<null | { owner: string; status: string; confidence: string; lastTransfer: string }>(null);
-  const landRecords = getLandRecords();
+  const { data: landRecords } = useSupabase<LandRecord>("land_records");
 
   const handleSearch = () => {
     if (!searchQuery.trim()) {

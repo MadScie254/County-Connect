@@ -2,7 +2,9 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Bell, CheckCircle2, AlertCircle, Info, Clock } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useState } from "react";
-import { getNotifications, markAllNotificationsRead } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 
 export default function Notifications() {
   const [items, setItems] = useState(getNotifications());

@@ -27,7 +27,9 @@ import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { getSelectedCounty } from "@/lib/counties";
 import { formatCurrency, cn } from "@/lib/utils";
-import { getApplications, getTenders, getRevenueEntries } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 
 const revenueData = [
   { name: "Mon", amount: 2.1 },
@@ -43,7 +45,7 @@ export default function AdminDashboard() {
   const selectedCounty = getSelectedCounty();
   
   const applications = getApplications();
-  const tenders = getTenders();
+  const { data: tenders } = useSupabase<Tender>("tenders");
   const revenues = getRevenueEntries();
 
   const pendingApprovals = applications.filter(a => a.status === "Pending Review").length;

@@ -1,7 +1,9 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Users, Heart, Wallet, CheckCircle2, Clock, MapPin, Search } from "lucide-react";
 import { useState } from "react";
-import { getWelfarePrograms } from "@/lib/store";
+import { useSupabase } from "@/hooks/useSupabase";
+import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 import { motion } from "motion/react";
 
 export default function SocialWelfare() {
