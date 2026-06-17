@@ -10,23 +10,39 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
   const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string>("citizen");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setLoading(false);
+      if (session) {
+        fetchProfile(session.user.id);
+      } else {
+        setLoading(false);
+      }
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      setLoading(false);
+      if (session) {
+        fetchProfile(session.user.id);
+      } else {
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  async function fetchProfile(userId: string) {
+    const { data } = await supabase.from('profiles').select('role').eq('id', userId).single();
+    if (data && data.role) {
+      setUserRole(data.role);
+    }
+    setLoading(false);
+  }
 
   if (loading) {
     return (
@@ -42,16 +58,16 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
   }
 
   // Superuser bypass
-  if (session.user.email === "danielwanjalamachimbo@gmail.com") {
+  if (session.user.email === "danielwanjalamachimbo@gmail.com" || userRole === "super_admin") {
     return <>{children}</>;
   }
 
-  // Retrieve role from user metadata, default to citizen
-  const userRole = session.user.user_metadata?.role || "citizen";
+  // Currently, the frontend role checks for "admin" (which we can map to county_admin) or "citizen"
+  const mappedUserRole = userRole === "county_admin" || userRole === "admin" ? "admin" : "citizen";
 
-  if (userRole !== role) {
+  if (mappedUserRole !== role) {
     // Logged in but wrong role
-    return <Navigate to={userRole === "admin" ? "/admin" : "/dashboard"} replace />;
+    return <Navigate to={mappedUserRole === "admin" ? "/admin" : "/dashboard"} replace />;
   }
 
   return <>{children}</>;
