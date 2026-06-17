@@ -9,7 +9,7 @@ import { getServices, addService, updateService, removeService } from "@/lib/sto
 
 
 export default function AdminServices() {
-  const [services, setServices] = useState<ServiceItem[]>(getServices() || []);
+  const [services, setServices] = useState<ServiceItem[]>((getServices() as ServiceItem[]) || []);
 
   const handleAddService = () => {
     const serviceName = window.prompt("Service name", "County Service");
@@ -26,7 +26,7 @@ export default function AdminServices() {
       fee: "Variable",
       status: "Draft",
     });
-    setServices(getServices());
+    setServices((getServices() as ServiceItem[]) || []);
   };
 
   const handleEditService = (serviceId: number) => {
@@ -43,7 +43,7 @@ export default function AdminServices() {
     }
 
     updateService(serviceId, { name: updatedName });
-    setServices(getServices());
+    setServices((getServices() as ServiceItem[]) || []);
   };
 
   const handleDeleteService = (serviceId: number) => {
@@ -60,7 +60,7 @@ export default function AdminServices() {
     }
 
     removeService(serviceId);
-    setServices(getServices());
+    setServices((getServices() as ServiceItem[]) || []);
   };
 
   return (
