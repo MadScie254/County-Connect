@@ -8,7 +8,7 @@ import {
   getSelectedCountySlug,
   setSelectedCounty,
 } from "@/lib/counties";
-import { login } from "@/lib/auth";
+
 import { supabase } from "@/lib/supabase";
 
 export default function Register() {
@@ -37,6 +37,7 @@ export default function Register() {
           data: {
             full_name: `${firstName} ${lastName}`,
             phone,
+            role: "citizen" // Default to citizen on registration
           }
         }
       });
@@ -45,13 +46,6 @@ export default function Register() {
         throw error;
       }
 
-      // Automatically sign in locally for legacy mock features to work
-      login({
-        role: "citizen",
-        countySlug: selectedCounty.slug,
-        name: `${firstName} ${lastName}`,
-        email: email,
-      });
 
       navigate(`/dashboard`);
     } catch (err: any) {

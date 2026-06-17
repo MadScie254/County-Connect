@@ -8,7 +8,7 @@ import {
   getSelectedCountySlug,
   setSelectedCounty,
 } from "@/lib/counties";
-import { login } from "@/lib/auth";
+
 import { supabase } from "@/lib/supabase";
 
 export default function Login() {
@@ -48,13 +48,6 @@ export default function Login() {
         throw error;
       }
 
-      // Also set the local session for legacy compatibility with the mock data store
-      login({
-        role,
-        countySlug: selectedCounty.slug,
-        name: data.user?.user_metadata?.full_name || "Authenticated User",
-        email: data.user?.email || email,
-      });
 
       if (role === "admin") {
         navigate(`/admin`);
@@ -71,13 +64,7 @@ export default function Login() {
 
   const handleProviderLogin = (provider: "google" | "ecitizen") => {
     setSelectedCounty(selectedCounty.slug);
-    login({
-      role,
-      countySlug: selectedCounty.slug,
-      name: `${provider} User`,
-      email: `user@${provider}.com`,
-    });
-    navigate(`/${role === "admin" ? "admin" : "dashboard"}`);
+    alert(`${provider} login flow will be integrated in Phase 4.`);
   };
 
   return (
