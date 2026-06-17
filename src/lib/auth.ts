@@ -1,50 +1,12 @@
-// Authentication & Role Management
+import { supabase } from "./supabase";
 
-export interface UserSession {
-  role: "citizen" | "admin";
-  countySlug: string;
-  name: string;
-  email: string;
-  idNumber?: string;
-  department?: string;
-}
-
-const SESSION_KEY = "countyconnect:session";
-
-export function login(session: UserSession) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-  
-  // Also set the selected county for legacy compatibility
-  localStorage.setItem("countyconnect:selected-county", session.countySlug);
-}
-
-export function logout() {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(SESSION_KEY);
-}
-
-export function getCurrentSession(): UserSession | null {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(SESSION_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as UserSession;
-  } catch {
-    return null;
+export async function logout() {
+  await supabase.auth.signOut();
+  if (typeof window !== "undefined") {
+    // Keep county selection if needed, but remove any legacy mock tokens
+    localStorage.removeItem("countyconnect:session");
   }
 }
 
-export function isAuthenticated(): boolean {
-  return getCurrentSession() !== null;
-}
-
-export function isAdmin(): boolean {
-  const session = getCurrentSession();
-  return session !== null && session.role === "admin";
-}
-
-export function isCitizen(): boolean {
-  const session = getCurrentSession();
-  return session !== null && session.role === "citizen";
-}
+// Note: Other auth logic like getting current session or roles is now handled 
+// reactively via supabase.auth.onAuthStateChange in components like ProtectedRoute.
