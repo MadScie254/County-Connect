@@ -1,4 +1,5 @@
 import { addApplication, addRevenueEntry } from "@/lib/store";
+import { MpesaModal } from "@/components/MpesaModal";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -18,12 +19,14 @@ const steps = [
   { id: 5, name: "Payment" },
 ];
 
+
 export default function ApplicationForm() {
   const { serviceId } = useParams();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"mpesa" | "card">("mpesa");
+  const [isMpesaModalOpen, setIsMpesaModalOpen] = useState(false);
   
   // Form State
   const [businessName, setBusinessName] = useState("");
@@ -35,7 +38,11 @@ export default function ApplicationForm() {
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     } else {
-      handleSubmit();
+      if (paymentMethod === "mpesa") {
+        setIsMpesaModalOpen(true);
+      } else {
+        handleSubmit();
+      }
     }
   };
 
@@ -288,6 +295,15 @@ export default function ApplicationForm() {
           </div>
         </div>
       </div>
+      
+      <MpesaModal 
+        isOpen={isMpesaModalOpen} 
+        onClose={() => setIsMpesaModalOpen(false)} 
+        amount={15000} 
+        reference={`SBP-${Date.now().toString().slice(-6)}`}
+        description="Single Business Permit"
+        onSuccess={handleSubmit} 
+      />
     </DashboardLayout>
   );
 }
