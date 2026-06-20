@@ -6,7 +6,8 @@ import { useState, useEffect } from "react";
 import { useSupabase } from "@/hooks/useSupabase";
 import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, generatePDFReport } from "@/lib/utils";
+import { AdminActionModal } from "@/components/AdminActionModal";
 
 const TARGET_WIDTH_CLASSES: Record<string, string> = {
    "80%": "w-4/5",
@@ -17,6 +18,7 @@ const TARGET_WIDTH_CLASSES: Record<string, string> = {
 
 export default function RevenueCollection() {
    const [advancedReconEnabled, setAdvancedReconEnabled] = useState(false);
+   const [isModalOpen, setIsModalOpen] = useState(false);
    const [treasuryMessage, setTreasuryMessage] = useState("");
    const [revenueEntries, setRevenueEntries] = useState(getRevenueEntries());
 
@@ -30,8 +32,19 @@ export default function RevenueCollection() {
    const recentEntries = revenueEntries.slice(0, 10);
    const totalMpesa = revenueEntries.reduce((sum, entry) => sum + entry.amount, 0);
 
-   const handleTreasuryPush = () => {
+   const confirmTreasuryPush = () => {
       setTreasuryMessage("Revenue batch queued for IFMIS treasury sync and audit log export.");
+      setIsModalOpen(false);
+   };
+
+   const handleExportArrears = () => {
+      // Mock data for the export
+      const data = [
+        ["LND-0012", "John Doe", "Nairobi CBD", "KES 45,000", "90 Days"],
+        ["LND-0015", "Jane Smith", "Westlands", "KES 120,000", "120 Days"],
+        ["MKT-004", "Kamau Traders", "City Market", "KES 15,000", "45 Days"],
+      ];
+      generatePDFReport("Target List - Uncollected Rates Arrears", ["Asset ID", "Owner", "Zone", "Amount Due", "Aging"], data, "Rates-Arrears-Report");
    };
 
   return (
@@ -94,7 +107,7 @@ export default function RevenueCollection() {
              </div>
              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Rates Arrears</p>
              <h3 className="text-3xl font-black text-red-600 mb-2">KES 120M</h3>
-             <div className="flex items-center gap-2 text-xs font-bold text-red-600 underline cursor-pointer">
+             <div onClick={handleExportArrears} className="flex items-center gap-2 text-xs font-bold text-red-600 underline cursor-pointer">
                 Export Target List
              </div>
           </div>
@@ -161,13 +174,47 @@ export default function RevenueCollection() {
                   </div>
               </div>
               <div className="p-8 pt-0 mt-4">
-                 <button type="button" onClick={handleTreasuryPush} className="w-full py-4 bg-emerald-500 text-black font-black rounded-2xl hover:bg-emerald-400 transition shadow-xl shadow-emerald-500/20 uppercase tracking-widest text-sm italic">
+                 <button type="button" onClick={() => setIsModalOpen(true)} className="w-full py-4 bg-emerald-500 text-black font-black rounded-2xl hover:bg-emerald-400 transition shadow-xl shadow-emerald-500/20 uppercase tracking-widest text-sm italic">
                     Push To Treasury IFMIS
                  </button>
-                 {treasuryMessage && <p className="mt-4 text-xs font-bold text-emerald-300">{treasuryMessage}</p>}
+                 {treasuryMessage && <p className="mt-4 text-xs font-bold text-emerald-300 text-center">{treasuryMessage}</p>}
               </div>
            </div>
         </div>
+
+        <AdminActionModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Confirm Treasury Push"
+          description="You are about to push the reconciled revenue batch to the national IFMIS treasury system."
+        >
+          <div className="space-y-4">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex justify-between mb-2">
+                <span className="text-sm text-gray-500">Batch Total:</span>
+                <span className="text-sm font-bold text-gray-900">{formatCurrency(totalMpesa)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-500">Transactions:</span>
+                <span className="text-sm font-bold text-gray-900">{revenueEntries.length}</span>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmTreasuryPush}
+                className="px-4 py-2 text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg transition-colors"
+              >
+                Confirm Push
+              </button>
+            </div>
+          </div>
+        </AdminActionModal>
       </div>
     </DashboardLayout>
   );

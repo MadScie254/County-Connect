@@ -5,10 +5,13 @@ import { useState } from "react";
 import { useSupabase } from "@/hooks/useSupabase";
 import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
+import { AdminActionModal } from "@/components/AdminActionModal";
 
 export default function CitizenEngagement() {
   const [statusMessage, setStatusMessage] = useState("");
   const [petitions, setPetitions] = useState(getPetitions());
+  const [isInputModalOpen, setIsInputModalOpen] = useState(false);
+  const [isGrievanceModalOpen, setIsGrievanceModalOpen] = useState(false);
 
   const handleVote = (id: number) => {
     votePetition(id);
@@ -16,12 +19,14 @@ export default function CitizenEngagement() {
     setStatusMessage("Your signature has been securely recorded on the county ledger.");
   };
 
-  const handlePublicInput = () => {
+  const confirmPublicInput = () => {
+    setIsInputModalOpen(false);
     window.location.href = "mailto:participation@countyconnect.go.ke?subject=Public%20Participation%20Input";
     setStatusMessage("Opening your mail app to submit public input.");
   };
 
-  const handleGrievance = () => {
+  const confirmGrievance = () => {
+    setIsGrievanceModalOpen(false);
     window.location.href = "mailto:grievances@countyconnect.go.ke?subject=County%20Grievance";
     setStatusMessage("Opening your mail app to lodge a grievance.");
   };
@@ -59,7 +64,7 @@ export default function CitizenEngagement() {
               ))}
             </div>
             <div className="p-6 pt-0">
-               <button type="button" onClick={handlePublicInput} className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition flex items-center justify-center gap-2">
+               <button type="button" onClick={() => setIsInputModalOpen(true)} className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition flex items-center justify-center gap-2">
                  Submit Input <Send className="w-4 h-4" />
                </button>
             </div>
@@ -83,7 +88,7 @@ export default function CitizenEngagement() {
                   Report service delivery failures, corruption, or infrastructure issues directly to the Governor's office.
                 </p>
               </div>
-              <button type="button" onClick={handleGrievance} className="px-8 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition shadow-lg shadow-red-100">
+              <button type="button" onClick={() => setIsGrievanceModalOpen(true)} className="px-8 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition shadow-lg shadow-red-100">
                 Lodge Grievance
               </button>
               {statusMessage && <p className="text-xs font-medium text-emerald-700">{statusMessage}</p>}
@@ -126,6 +131,38 @@ export default function CitizenEngagement() {
              </div>
           </div>
         </div>
+
+        <AdminActionModal
+          isOpen={isInputModalOpen}
+          onClose={() => setIsInputModalOpen(false)}
+          title="Submit Public Input"
+          description="You are about to launch your default email client to submit public participation feedback to the county office."
+        >
+          <div className="flex justify-end gap-3">
+            <button onClick={() => setIsInputModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+              Cancel
+            </button>
+            <button onClick={confirmPublicInput} className="px-4 py-2 text-sm font-medium bg-gray-900 text-white hover:bg-black rounded-lg transition-colors flex items-center gap-2">
+              Launch Email Client <Send className="w-4 h-4" />
+            </button>
+          </div>
+        </AdminActionModal>
+
+        <AdminActionModal
+          isOpen={isGrievanceModalOpen}
+          onClose={() => setIsGrievanceModalOpen(false)}
+          title="Lodge Grievance"
+          description="Grievances are tracked centrally. Would you like to proceed to write your grievance using your default email client?"
+        >
+          <div className="flex justify-end gap-3">
+            <button onClick={() => setIsGrievanceModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+              Cancel
+            </button>
+            <button onClick={confirmGrievance} className="px-4 py-2 text-sm font-medium bg-red-600 text-white hover:bg-red-700 rounded-lg transition-colors flex items-center gap-2">
+              Lodge Grievance <FileWarning className="w-4 h-4" />
+            </button>
+          </div>
+        </AdminActionModal>
       </div>
     </DashboardLayout>
   );

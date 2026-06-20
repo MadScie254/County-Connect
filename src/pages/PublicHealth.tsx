@@ -5,22 +5,27 @@ import { useState } from "react";
 import { useSupabase } from "@/hooks/useSupabase";
 import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
+import { AdminActionModal } from "@/components/AdminActionModal";
 
 export default function PublicHealth() {
    const [restockMessage, setRestockMessage] = useState("");
    const [dispatchMessage, setDispatchMessage] = useState("");
    const [healthDrugs, setHealthDrugs] = useState(getHealthDrugs());
+   const [isRestockModalOpen, setIsRestockModalOpen] = useState(false);
+   const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
 
-   const handleRestockAll = () => {
+   const confirmRestockAll = () => {
       healthDrugs.filter(d => d.level === "critical").forEach(d => {
          updateDrugStock(d.id, "Restocked (100 units)", "high");
       });
       setHealthDrugs(getHealthDrugs());
       setRestockMessage("Critical stock-out facilities have been queued for immediate replenishment.");
+      setIsRestockModalOpen(false);
    };
 
-   const handleDispatchReports = () => {
+   const confirmDispatchReports = () => {
       setDispatchMessage("MOH 105 reports dispatched to the county health office and archived locally.");
+      setIsDispatchModalOpen(false);
    };
 
   return (
@@ -86,7 +91,7 @@ export default function PublicHealth() {
                   <Package className="w-5 h-5 text-blue-600" />
                   Drug Stock Control Bridge
                 </h3>
-                        <button type="button" onClick={handleRestockAll} className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline">Restock All</button>
+                        <button type="button" onClick={() => setIsRestockModalOpen(true)} className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline">Restock All</button>
               </div>
               <div className="p-6">
                  <div className="space-y-4">
@@ -130,12 +135,45 @@ export default function PublicHealth() {
                     </div>
                  </div>
               </div>
-              <button type="button" onClick={handleDispatchReports} className="relative z-10 mt-8 py-4 bg-emerald-500 text-black font-black rounded-2xl hover:bg-emerald-400 transition transform active:scale-95 shadow-xl shadow-emerald-500/20 uppercase tracking-widest text-sm">
+              <button type="button" onClick={() => setIsDispatchModalOpen(true)} className="relative z-10 mt-8 py-4 bg-emerald-500 text-black font-black rounded-2xl hover:bg-emerald-400 transition transform active:scale-95 shadow-xl shadow-emerald-500/20 uppercase tracking-widest text-sm">
                  Dispatch Reports to MOH
               </button>
               {dispatchMessage && <p className="relative z-10 mt-4 text-xs font-bold text-emerald-200">{dispatchMessage}</p>}
            </div>
         </div>
+
+        <AdminActionModal
+          isOpen={isRestockModalOpen}
+          onClose={() => setIsRestockModalOpen(false)}
+          title="Confirm Fleet Dispatch"
+          description="You are about to authorize the deployment of medical supplies to all Level 2 and Level 3 facilities currently reporting critical stock-outs."
+        >
+          <div className="flex justify-end gap-3 mt-4">
+            <button onClick={() => setIsRestockModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+              Cancel
+            </button>
+            <button onClick={confirmRestockAll} className="px-4 py-2 text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg transition-colors flex items-center gap-2">
+              Authorize Dispatch <Package className="w-4 h-4" />
+            </button>
+          </div>
+        </AdminActionModal>
+
+        <AdminActionModal
+          isOpen={isDispatchModalOpen}
+          onClose={() => setIsDispatchModalOpen(false)}
+          title="Dispatch MOH 105 Reports"
+          description="This action will finalize the current reporting period and securely transmit the aggregated MOH 105 reports to the national Ministry of Health database."
+        >
+          <div className="flex justify-end gap-3 mt-4">
+            <button onClick={() => setIsDispatchModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+              Cancel
+            </button>
+            <button onClick={confirmDispatchReports} className="px-4 py-2 text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg transition-colors flex items-center gap-2">
+              Transmit Reports <ClipboardList className="w-4 h-4" />
+            </button>
+          </div>
+        </AdminActionModal>
+
       </div>
     </DashboardLayout>
   );
