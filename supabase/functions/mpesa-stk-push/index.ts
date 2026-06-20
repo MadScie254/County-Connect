@@ -1,8 +1,8 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
-const DARAJA_CONSUMER_KEY = Deno.env.get("DARAJA_CONSUMER_KEY") ?? "";
-const DARAJA_CONSUMER_SECRET = Deno.env.get("DARAJA_CONSUMER_SECRET") ?? "";
+const DARAJA_CONSUMER_KEY = Deno.env.get("DARAJA_CONSUMER_KEY") ?? "TStt6uIQYqVYcl35RT4h7McQ8YMWDXTfLTop0b3NMoA8MNp7";
+const DARAJA_CONSUMER_SECRET = Deno.env.get("DARAJA_CONSUMER_SECRET") ?? "WdTpidz3f9cvTGv1bEvevwwOY3y0HPs83CnGJwvhZ17genGpysHXTYE0i7WYnoOC";
 const DARAJA_PASSKEY = Deno.env.get("DARAJA_PASSKEY") ?? "";
 const DARAJA_SHORTCODE = Deno.env.get("DARAJA_SHORTCODE") ?? "174379"; // Sandbox default
 const DARAJA_ENV = Deno.env.get("DARAJA_ENV") ?? "sandbox";
