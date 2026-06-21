@@ -107,20 +107,20 @@ export default function UserProfile() {
                   className="w-24 h-24 rounded-full object-cover mx-auto border-4 border-white shadow-sm"
                 />
               ) : (
-                <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 text-3xl font-bold mx-auto border-4 border-white shadow-sm">
-                  {profile.initials}
+                <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 text-3xl font-bold mx-auto border-4 border-white shadow-sm uppercase">
+                  {(profile?.name || "C").slice(0, 2)}
                 </div>
               )}
               <button type="button" onClick={handleAvatarClick} aria-label="Change profile photo" title="Change profile photo" className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-md border border-gray-200 text-gray-500 hover:text-emerald-600">
                 <Camera className="w-4 h-4" />
               </button>
             </div>
-            <h3 className="text-xl font-bold text-gray-900">{profile.fullName}</h3>
-            <p className="text-gray-500 text-sm mb-4">Citizen ID: {profile.idNumber}</p>
+            <h3 className="text-xl font-bold text-gray-900">{profile?.name || "Citizen"}</h3>
+            <p className="text-gray-500 text-sm mb-4">Citizen ID: {profile?.national_id || "N/A"}</p>
             <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
               Verified Citizen
             </div>
-            <p className="mt-4 text-xs text-gray-500">{profile.ward}, {profile.county}</p>
+            <p className="mt-4 text-xs text-gray-500">Nairobi, Kenya</p>
           </div>
 
           {/* Edit Form */}
@@ -129,24 +129,24 @@ export default function UserProfile() {
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="first-name" className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <label htmlFor="full-name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input id="first-name" type="text" value={profile.firstName} onChange={(event) => setProfile((current: CitizenProfile) => ({ ...current, firstName: event.target.value, fullName: `${event.target.value} ${current.lastName}`.trim() }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="First name" placeholder="Daniel" />
+                    <input id="full-name" type="text" value={formData.name} onChange={(event) => setFormData(cur => ({ ...cur, name: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="Full name" placeholder="Full Name" />
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="last-name" className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <label htmlFor="national-id" className="block text-sm font-medium text-gray-700 mb-1">National ID</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input id="last-name" type="text" value={profile.lastName} onChange={(event) => setProfile((current: CitizenProfile) => ({ ...current, lastName: event.target.value, fullName: `${current.firstName} ${event.target.value}`.trim() }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="Last name" placeholder="Wanjala Machimbo" />
+                    <input id="national-id" type="text" value={formData.national_id} onChange={(event) => setFormData(cur => ({ ...cur, national_id: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="National ID" placeholder="12345678" />
                   </div>
                 </div>
                 <div>
                   <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input id="email-address" type="email" value={profile.email} onChange={(event) => setProfile((current: CitizenProfile) => ({ ...current, email: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="Email address" placeholder="daniel.wanjala@county.go.ke" />
+                    <input id="email-address" type="email" value={user?.email || ""} disabled className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50 opacity-70" title="Email address" />
                   </div>
                 </div>
                 <div>
