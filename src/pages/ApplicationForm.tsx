@@ -8,9 +8,6 @@ import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { useAuth } from "@/context/AuthContext";
 import { uploadFileToBucket } from "@/lib/mutations";
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
 
 const steps = [
   { id: 1, name: "Business Details" },
@@ -60,6 +57,11 @@ export default function ApplicationForm() {
   };
 
   const handleSubmit = async () => {
+    if (!user?.id) {
+      console.error("Cannot submit an application without an authenticated user.");
+      return;
+    }
+
     setIsSubmitting(true);
     setIsUploading(true);
 
@@ -78,9 +80,10 @@ export default function ApplicationForm() {
 
       // Create Application
       await addApplication({
+        userId: user.id,
         applicant: profile?.name || "Citizen",
         applicantId: profile?.national_id || "24567890",
-        applicantEmail: user?.email || "test@example.com",
+        applicantEmail: user.email || "test@example.com",
         applicantPhone: profile?.phone_number || "254700000000",
         service: "Single Business Permit",
         amount: 15000,

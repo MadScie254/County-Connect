@@ -23,8 +23,9 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
     return <Navigate to={`/login${role === "admin" ? "?role=admin" : ""}`} replace />;
   }
 
-  // Superuser bypass
-  if (user.email === "danielwanjalamachimbo@gmail.com" || profile?.role === "admin" || profile?.role === "super_admin") {
+  const isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
+
+  if (role === "admin" && isAdmin) {
     return <>{children}</>;
   }
 

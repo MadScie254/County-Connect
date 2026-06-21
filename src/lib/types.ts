@@ -8,11 +8,13 @@ export interface Profile {
   national_id?: string;
   role: "citizen" | "admin" | "business" | "super_admin";
   avatar_url?: string;
+  address?: string;
 }
 
 // ─── Types ───────────────────────────────────────────────────────────
 export interface Application {
   id: string;
+  userId?: string;
   applicant: string;
   applicantId: string;
   applicantEmail: string;

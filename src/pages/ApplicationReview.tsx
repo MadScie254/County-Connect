@@ -1,4 +1,4 @@
-import { getApplicationById, updateApplicationStatus } from "@/lib/store";
+import { useApplicationById, updateApplicationStatus } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useParams, useNavigate } from "react-router-dom";
 import { 
@@ -15,9 +15,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { formatDate, formatCurrency } from "@/lib/utils";
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
 
 // Documents are mocked for demonstration purposes
 const mockDocuments = [
@@ -29,9 +26,17 @@ const mockDocuments = [
 export default function ApplicationReview() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const applicationData = getApplicationById(id || "");
+  const { data: applicationData, loading } = useApplicationById(id || "");
   
   const [isProcessing, setIsProcessing] = useState(false);
+
+  if (loading) {
+    return (
+      <DashboardLayout role="admin">
+        <div className="p-12 text-center text-gray-500">Loading application...</div>
+      </DashboardLayout>
+    );
+  }
 
   if (!applicationData) {
     return (
@@ -43,10 +48,15 @@ export default function ApplicationReview() {
 
   const handleAction = (newStatus: "Approved" | "Rejected" | "Changes Requested") => {
     setIsProcessing(true);
-    setTimeout(() => {
-      updateApplicationStatus(applicationData.id, newStatus);
-      setIsProcessing(false);
-      navigate("/admin/applications");
+    setTimeout(async () => {
+      try {
+        await updateApplicationStatus(applicationData.id, newStatus);
+        navigate("/admin/applications");
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsProcessing(false);
+      }
     }, 1000);
   };
 

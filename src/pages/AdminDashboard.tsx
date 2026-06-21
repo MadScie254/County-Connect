@@ -1,4 +1,4 @@
-import { getApplications, getRevenueEntries } from "@/lib/store";
+import { useApplications, useRevenueEntries, useTenders } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { 
   Users, 
@@ -28,9 +28,6 @@ import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { getSelectedCounty } from "@/lib/counties";
 import { formatCurrency, cn } from "@/lib/utils";
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
 
 const revenueData = [
   { name: "Mon", amount: 2.1 },
@@ -45,9 +42,9 @@ const revenueData = [
 export default function AdminDashboard() {
   const selectedCounty = getSelectedCounty();
   
-  const applications = getApplications();
-  const { data: tenders } = useSupabase<Tender>("tenders");
-  const revenues = getRevenueEntries();
+  const { data: applications } = useApplications();
+  const { data: tenders } = useTenders();
+  const { data: revenues } = useRevenueEntries();
 
   const pendingApprovals = applications.filter(a => a.status === "Pending Review").length;
   const activeTenders = tenders.filter(t => t.status === "Open" || t.status === "Evaluated").length;

@@ -1,16 +1,11 @@
-import { getDepartments, addDepartment } from "@/lib/store";
+import { addDepartment, useDepartments } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Plus, Users, Building2 } from "lucide-react";
-import { useState } from "react";
-
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
 
 export default function AdminDepartments() {
-  const [departments, setDepartments] = useState(getDepartments());
+  const { data: departments } = useDepartments();
 
-  const handleAddDepartment = () => {
+  const handleAddDepartment = async () => {
     const departmentName = window.prompt("Department name", "New Department");
 
     if (!departmentName) {
@@ -19,13 +14,12 @@ export default function AdminDepartments() {
 
     const departmentHead = window.prompt("Department head", "County Officer") ?? "County Officer";
 
-    addDepartment({
+    await addDepartment({
       name: departmentName,
       head: departmentHead,
       staff: 12,
       services: 1,
     });
-    setDepartments(getDepartments());
   };
 
   return (

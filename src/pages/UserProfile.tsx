@@ -27,7 +27,7 @@ export default function UserProfile() {
         name: profile.name || "",
         phone_number: profile.phone_number || "",
         national_id: profile.national_id || "",
-        address: "" // Address isn't in generic profile currently, could add to DB later
+        address: profile.address || ""
       });
       setAvatarPreview(profile.avatar_url || null);
     }
@@ -54,6 +54,7 @@ export default function UserProfile() {
           name: formData.name,
           phone_number: formData.phone_number,
           national_id: formData.national_id,
+          address: formData.address,
           avatar_url: finalAvatarUrl,
         })
         .eq("id", profile.id);

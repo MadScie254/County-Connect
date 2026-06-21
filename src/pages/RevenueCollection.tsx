@@ -1,11 +1,8 @@
-import { getRevenueEntries, subscribe } from "@/lib/store";
+import { useRevenueEntries } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Coins, Smartphone, TrendingUp, AlertCircle, BarChart3, Search, Filter } from "lucide-react";
 import { motion } from "motion/react";
-import { useState, useEffect } from "react";
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
+import { useState } from "react";
 import { formatCurrency, generatePDFReport } from "@/lib/utils";
 import { AdminActionModal } from "@/components/AdminActionModal";
 
@@ -20,14 +17,7 @@ export default function RevenueCollection() {
    const [advancedReconEnabled, setAdvancedReconEnabled] = useState(false);
    const [isModalOpen, setIsModalOpen] = useState(false);
    const [treasuryMessage, setTreasuryMessage] = useState("");
-   const [revenueEntries, setRevenueEntries] = useState(getRevenueEntries());
-
-   useEffect(() => {
-     const unsubscribe = subscribe("revenue:new", () => {
-       setRevenueEntries(getRevenueEntries());
-     });
-     return unsubscribe;
-   }, []);
+   const { data: revenueEntries } = useRevenueEntries();
 
    const recentEntries = revenueEntries.slice(0, 10);
    const totalMpesa = revenueEntries.reduce((sum, entry) => sum + entry.amount, 0);

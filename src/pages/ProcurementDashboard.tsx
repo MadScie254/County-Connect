@@ -1,4 +1,4 @@
-import { getTenders } from "@/lib/store";
+import { useTenders } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { 
   BarChart, 
@@ -15,9 +15,6 @@ import {
 import { Search, Filter, AlertTriangle, CheckCircle2, Building2, FileText, TrendingUp } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
 const awardDistribution = [
   { name: "Mega Corp Ltd", value: 12 },
   { name: "BuildWell Inc", value: 8 },
@@ -31,7 +28,7 @@ const COLOR_CLASSES = ['bg-emerald-500', 'bg-blue-500', 'bg-amber-500', 'bg-gray
 export default function ProcurementDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [openOnly, setOpenOnly] = useState(false);
-  const allTenders = getTenders();
+  const { data: allTenders } = useTenders();
 
   const filteredTenders = allTenders.filter((tender) => {
     const matchesSearch = [tender.id, tender.title, tender.entity].join(" ").toLowerCase().includes(searchTerm.toLowerCase());

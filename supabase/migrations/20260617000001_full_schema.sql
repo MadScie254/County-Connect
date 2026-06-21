@@ -108,17 +108,6 @@ ALTER TABLE public.petitions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.land_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.anomalies ENABLE ROW LEVEL SECURITY;
 
--- Admins can do everything
-CREATE POLICY "Admins manage tenders" ON public.tenders FOR ALL USING (auth.email() = 'danielwanjalamachimbo@gmail.com');
-CREATE POLICY "Admins manage departments" ON public.departments FOR ALL USING (auth.email() = 'danielwanjalamachimbo@gmail.com');
-CREATE POLICY "Admins manage notifications" ON public.notifications FOR ALL USING (auth.email() = 'danielwanjalamachimbo@gmail.com');
-CREATE POLICY "Admins manage revenue" ON public.revenue FOR ALL USING (auth.email() = 'danielwanjalamachimbo@gmail.com');
-CREATE POLICY "Admins manage health_drugs" ON public.health_drugs FOR ALL USING (auth.email() = 'danielwanjalamachimbo@gmail.com');
-CREATE POLICY "Admins manage welfare" ON public.welfare FOR ALL USING (auth.email() = 'danielwanjalamachimbo@gmail.com');
-CREATE POLICY "Admins manage petitions" ON public.petitions FOR ALL USING (auth.email() = 'danielwanjalamachimbo@gmail.com');
-CREATE POLICY "Admins manage land_records" ON public.land_records FOR ALL USING (auth.email() = 'danielwanjalamachimbo@gmail.com');
-CREATE POLICY "Admins manage anomalies" ON public.anomalies FOR ALL USING (auth.email() = 'danielwanjalamachimbo@gmail.com');
-
 -- Public / Citizens Policies
 CREATE POLICY "Anyone can view open tenders" ON public.tenders FOR SELECT USING (true);
 CREATE POLICY "Anyone can view departments" ON public.departments FOR SELECT USING (true);

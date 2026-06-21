@@ -1,21 +1,17 @@
-import { getPetitions, votePetition } from "@/lib/store";
+import { usePetitions, votePetition } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { MessageSquare, ThumbsUp, Send, Users, FileWarning, HelpCircle } from "lucide-react";
 import { useState } from "react";
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
 import { AdminActionModal } from "@/components/AdminActionModal";
 
 export default function CitizenEngagement() {
   const [statusMessage, setStatusMessage] = useState("");
-  const [petitions, setPetitions] = useState(getPetitions());
+  const { data: petitions } = usePetitions();
   const [isInputModalOpen, setIsInputModalOpen] = useState(false);
   const [isGrievanceModalOpen, setIsGrievanceModalOpen] = useState(false);
 
-  const handleVote = (id: number) => {
-    votePetition(id);
-    setPetitions(getPetitions());
+  const handleVote = async (id: number) => {
+    await votePetition(id);
     setStatusMessage("Your signature has been securely recorded on the county ledger.");
   };
 

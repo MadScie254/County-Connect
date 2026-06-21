@@ -2,7 +2,7 @@
 
 CountyConnect is a white-label county government platform for Kenya. It is designed to digitize permit applications, payments, service delivery, revenue collection, public engagement, and administrative oversight in one county-aware system.
 
-The current repository is a polished front-end MVP. It focuses on realistic user journeys, county-specific pricing and login, and operational dashboards for both citizens and county staff. Most interactions are wired to in-app state, browser storage, and navigation so the product feels usable and demo-ready even before a backend is added.
+The current repository is a React and Supabase MVP. It focuses on realistic user journeys, county-specific pricing and login, operational dashboards for citizens and county staff, and Supabase-backed auth, profiles, applications, service data, storage, and Edge Functions.
 
 ## Executive Summary
 
@@ -13,7 +13,7 @@ It is designed to:
 - Present county-specific pricing and login flows
 - Give citizens one place to apply, pay, track, and engage
 - Give county teams one place to review, manage, and report
-- Feel realistic in demos even before backend services are connected
+- Feel realistic in demos while using Supabase for the core persistence layer
 - Scale from a small county rollout to a broader multi-county deployment
 
 ## What this system is about
@@ -78,9 +78,9 @@ The application behaves like a single-page government portal:
 2. Users choose a county, and that selection is persisted in browser storage.
 3. Citizens and admins enter through role-aware login routes.
 4. Dashboards and forms reuse the selected county so the experience stays consistent.
-5. Forms, buttons, downloads, toggles, and review actions are connected to local state so the UI is functional inside the browser.
+5. Profiles, applications, services, departments, notifications, and dashboards read from Supabase tables through RLS-protected APIs.
 
-The demo citizen profile is seeded with Daniel Wanjala Machimbo so the UI reads like a real government workflow instead of placeholder content.
+Some specialized vertical workflows still include simulated integration states so the UI reads like a real government workflow while external integrations are phased in.
 
 ## Tech stack
 
@@ -89,6 +89,7 @@ The demo citizen profile is seeded with Daniel Wanjala Machimbo so the UI reads 
 - Vite 6
 - Tailwind CSS 4
 - React Router DOM 7.13
+- Supabase Auth, Database, Storage, and Edge Functions
 - Motion
 - Recharts
 - Lucide React
@@ -97,7 +98,9 @@ The demo citizen profile is seeded with Daniel Wanjala Machimbo so the UI reads 
 
 - `src/pages/` contains the public pages, citizen views, admin views, and form flows
 - `src/components/` contains shared layout components such as the dashboard shell
-- `src/lib/` contains shared helpers and data models such as county catalog and profile data
+- `src/lib/` contains shared helpers, Supabase mutations, typed data hooks, and data models
+- `supabase/migrations/` contains database schema, RLS policies, grants, and storage setup
+- `supabase/functions/` contains Supabase Edge Functions such as M-Pesa STK push and webhook handlers
 - `src/App.tsx` defines the routing map for the full experience
 
 ## Main routes
@@ -131,7 +134,7 @@ The demo citizen profile is seeded with Daniel Wanjala Machimbo so the UI reads 
 
 ## Architecture
 
-CountyConnect is organized as a front-end application with shared data helpers and county-aware local state.
+CountyConnect is organized as a Vite front-end with Supabase as the persistence and auth layer.
 
 ```mermaid
 flowchart LR
@@ -142,8 +145,8 @@ flowchart LR
 	Citizen --> Forms[Applications, profile, notifications]
 	Admin --> Ops[Revenue, procurement, services, health, welfare, API hub]
 	County --> Storage[(Browser storage)]
-	Forms --> Storage
-	Ops --> Storage
+	Forms --> Supabase[(Supabase)]
+	Ops --> Supabase
 	Shared[src/lib helpers and county catalog] --> Landing
 	Shared --> Login
 	Shared --> Citizen
@@ -157,18 +160,42 @@ flowchart LR
 - Citizen workflows for services, applications, tax compliance, land, welfare, and engagement
 - Admin workflows for applications, analytics, services, departments, settings, procurement, revenue, health, and APIs
 
+## Supabase Setup
+
+Create a Supabase project, then apply the migrations in `supabase/migrations/`. The schema enables RLS and expects admin access to come from `public.profiles.role` with `admin` or `super_admin`.
+
+Required Vite environment variables:
+
+```bash
+VITE_SUPABASE_URL="https://your-project-ref.supabase.co"
+VITE_SUPABASE_PUBLISHABLE_KEY="your-supabase-publishable-key"
+```
+
+Required Edge Function secrets for M-Pesa:
+
+```bash
+APP_URL="https://your-project-ref.supabase.co"
+DARAJA_CONSUMER_KEY=""
+DARAJA_CONSUMER_SECRET=""
+DARAJA_PASSKEY=""
+DARAJA_SHORTCODE=""
+DARAJA_ENV="sandbox"
+```
+
+The M-Pesa secrets must be stored as Supabase Edge Function secrets, not committed to source control.
+
 ## Deployment and Environment
 
-The current build is meant to run as a browser-based Vite app.
+The current build is meant to run as a browser-based Vite app backed by Supabase.
 
 - Development server: `npm run dev`
 - Production build: `npm run build`
 - Production preview: `npm run preview`
 - TypeScript validation: `npm run lint`
 
-No runtime environment variables are required for the current front-end MVP.
+Runtime configuration is required through `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.
 
-The app persists county selection, profile data, and a few settings in browser storage. If you later connect a backend, this is the layer where API calls, authentication, and real persistence can be introduced without changing the public product story.
+The app still persists county selection in browser storage, while account, profile, application, dashboard, and storage workflows use Supabase.
 
 ## Getting started
 
@@ -211,10 +238,10 @@ npm run preview
 
 ## Current implementation notes
 
-- This repository currently behaves as a browser-based MVP rather than a full production backend.
-- Many actions are intentionally local and simulated so the user journey feels real during demos.
-- County selection, profile data, and some settings persist in browser storage.
-- The UI is structured to make backend, authentication, payments, and integration work easy to add later.
+- Supabase is now the backend for auth, profiles, application submission, storage, service data, and core dashboard reads.
+- County selection still persists in browser storage and should move onto the user profile for production multi-county rollout.
+- Some vertical workflows and external integrations remain simulated or partially wired, including OAuth provider alerts, final payment reconciliation, and some document review views.
+- Admin authorization is based on `profiles.role`; seed or assign `admin` / `super_admin` deliberately before using admin routes.
 
 ## Why this matters
 

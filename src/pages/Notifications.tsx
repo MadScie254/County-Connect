@@ -1,18 +1,12 @@
-import { getNotifications, markAllNotificationsRead } from "@/lib/store";
+import { markAllNotificationsRead, useNotifications } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Bell, CheckCircle2, AlertCircle, Info, Clock } from "lucide-react";
-import { formatDate } from "@/lib/utils";
-import { useState } from "react";
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
 
 export default function Notifications() {
-  const [items, setItems] = useState(getNotifications());
+  const { data: items } = useNotifications();
 
-  const handleMarkAllAsRead = () => {
-    markAllNotificationsRead();
-    setItems(getNotifications());
+  const handleMarkAllAsRead = async () => {
+    await markAllNotificationsRead();
   };
 
   return (

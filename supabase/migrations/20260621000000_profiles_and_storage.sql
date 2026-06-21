@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   national_id TEXT,
   role TEXT DEFAULT 'citizen',
   avatar_url TEXT,
+  address TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -15,22 +16,23 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can read own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Admins can read all profiles" ON public.profiles FOR SELECT USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'super_admin'))
 );
-CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 
 -- Trigger to create profile when auth.user created
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, name, email, national_id, phone_number, role)
+  INSERT INTO public.profiles (id, name, email, national_id, phone_number, role, address)
   VALUES (
     new.id,
     new.raw_user_meta_data->>'name',
     new.email,
     new.raw_user_meta_data->>'national_id',
     new.raw_user_meta_data->>'phone_number',
-    COALESCE(new.raw_user_meta_data->>'role', 'citizen')
+    COALESCE(new.raw_user_meta_data->>'role', 'citizen'),
+    new.raw_user_meta_data->>'address'
   );
   RETURN new;
 END;

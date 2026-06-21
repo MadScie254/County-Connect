@@ -1,4 +1,4 @@
-import { getApplications } from "@/lib/store";
+import { useApplications } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ArrowUpRight, Clock, FileCheck, AlertCircle, Plus, Building2, Globe, Car, HardHat, Coins, HeartPulse, MessageSquare, Store } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -6,9 +6,6 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { getSelectedCounty } from "@/lib/counties";
 import { useAuth } from "@/context/AuthContext";
 
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
 const services = [
   { name: "Business Licensing", icon: Store, desc: "Apply for or renew Single Business Permits", link: "/apply/sbp" },
   { name: "Land Registry", icon: Globe, desc: "Search parcels and verify ownership chains", link: "/land-registry" },
@@ -20,11 +17,14 @@ const services = [
 
 export default function CitizenDashboard() {
   const selectedCounty = getSelectedCounty();
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
+  const { data: applications } = useApplications();
   
   // Using active profile ID for real data filtering, fallback for UI mock stability:
   const activeNationalId = profile?.national_id || "24567890";
-  const allApplications = getApplications().filter((app) => app.applicantId === activeNationalId);
+  const allApplications = applications.filter((app) => (
+    app.userId ? app.userId === user?.id : app.applicantId === activeNationalId
+  ));
   const recentApplications = allApplications.slice(0, 3);
   
   const inProgressCount = allApplications.filter((app) => app.status === "Pending Review").length;

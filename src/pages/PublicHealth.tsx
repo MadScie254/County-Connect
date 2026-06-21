@@ -1,24 +1,22 @@
-import { getHealthDrugs, updateDrugStock } from "@/lib/store";
+import { updateDrugStock, useHealthDrugs } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { HeartPulse, FlaskConical, Stethoscope, ClipboardList, Package, TrendingUp, Search } from "lucide-react";
 import { useState } from "react";
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
 import { AdminActionModal } from "@/components/AdminActionModal";
 
 export default function PublicHealth() {
    const [restockMessage, setRestockMessage] = useState("");
    const [dispatchMessage, setDispatchMessage] = useState("");
-   const [healthDrugs, setHealthDrugs] = useState(getHealthDrugs());
+   const { data: healthDrugs } = useHealthDrugs();
    const [isRestockModalOpen, setIsRestockModalOpen] = useState(false);
    const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
 
-   const confirmRestockAll = () => {
-      healthDrugs.filter(d => d.level === "critical").forEach(d => {
-         updateDrugStock(d.id, "Restocked (100 units)", "high");
-      });
-      setHealthDrugs(getHealthDrugs());
+   const confirmRestockAll = async () => {
+      await Promise.all(
+         healthDrugs
+            .filter((drug) => drug.level === "critical")
+            .map((drug) => updateDrugStock(drug.id, "Restocked (100 units)", "high"))
+      );
       setRestockMessage("Critical stock-out facilities have been queued for immediate replenishment.");
       setIsRestockModalOpen(false);
    };

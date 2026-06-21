@@ -1,17 +1,13 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Plus, Edit, Trash2, Search } from "lucide-react";
-import { useState } from "react";
 
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department, ServiceItem } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
-import { getServices, addService, updateService, removeService } from "@/lib/store";
+import { addService, removeService, updateService, useServices } from "@/lib/store";
 
 
 export default function AdminServices() {
-  const [services, setServices] = useState<ServiceItem[]>((getServices() as ServiceItem[]) || []);
+  const { data: services } = useServices();
 
-  const handleAddService = () => {
+  const handleAddService = async () => {
     const serviceName = window.prompt("Service name", "County Service");
 
     if (!serviceName) {
@@ -20,17 +16,16 @@ export default function AdminServices() {
 
     const departmentName = window.prompt("Owning department", "General Administration") ?? "General Administration";
 
-    addService({
+    await addService({
       name: serviceName,
       department: departmentName,
       fee: "Variable",
       status: "Draft",
     });
-    setServices((getServices() as ServiceItem[]) || []);
   };
 
-  const handleEditService = (serviceId: number) => {
-    const currentService = services.find((service: ServiceItem) => service.id === serviceId);
+  const handleEditService = async (serviceId: number) => {
+    const currentService = services.find((service) => service.id === serviceId);
 
     if (!currentService) {
       return;
@@ -42,12 +37,11 @@ export default function AdminServices() {
       return;
     }
 
-    updateService(serviceId, { name: updatedName });
-    setServices((getServices() as ServiceItem[]) || []);
+    await updateService(serviceId, { name: updatedName });
   };
 
-  const handleDeleteService = (serviceId: number) => {
-    const currentService = services.find((service: ServiceItem) => service.id === serviceId);
+  const handleDeleteService = async (serviceId: number) => {
+    const currentService = services.find((service) => service.id === serviceId);
 
     if (!currentService) {
       return;
@@ -59,8 +53,7 @@ export default function AdminServices() {
       return;
     }
 
-    removeService(serviceId);
-    setServices((getServices() as ServiceItem[]) || []);
+    await removeService(serviceId);
   };
 
   return (
@@ -98,7 +91,7 @@ export default function AdminServices() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {services.map((service: ServiceItem) => (
+              {services.map((service) => (
                 <tr key={service.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 font-medium text-gray-900">{service.name}</td>
                   <td className="px-6 py-4 text-gray-600">{service.department}</td>

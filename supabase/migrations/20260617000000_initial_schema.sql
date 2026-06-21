@@ -37,22 +37,10 @@ ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Anyone can view active services" ON public.services
     FOR SELECT USING (status = 'Active');
 
--- Admins can do everything on services (assuming we add a role claim or a profiles table later, but for now we'll allow authenticated users with superuser emails or just all authenticated for this demo to easily manage it)
--- Note: A real app would have a profiles table with role = 'admin'. 
-CREATE POLICY "Admins can manage services" ON public.services
-    FOR ALL USING (auth.email() = 'danielwanjalamachimbo@gmail.com');
-
 -- Applications Policies
 -- Citizens can view and insert their own applications
 CREATE POLICY "Citizens can view their own applications" ON public.applications
-    FOR SELECT USING (auth.uid() = user_id OR auth.email() = 'danielwanjalamachimbo@gmail.com');
+    FOR SELECT USING ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "Citizens can insert their own applications" ON public.applications
-    FOR INSERT WITH CHECK (auth.uid() = user_id OR auth.email() = 'danielwanjalamachimbo@gmail.com');
-
--- Admins can update any application
-CREATE POLICY "Admins can update all applications" ON public.applications
-    FOR UPDATE USING (auth.email() = 'danielwanjalamachimbo@gmail.com');
-
-CREATE POLICY "Admins can view all applications" ON public.applications
-    FOR SELECT USING (auth.email() = 'danielwanjalamachimbo@gmail.com');
+    FOR INSERT WITH CHECK ((SELECT auth.uid()) = user_id);

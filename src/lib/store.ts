@@ -1,32 +1,46 @@
 import { useSupabase } from "@/hooks/useSupabase";
+import { useMemo } from "react";
 import type { 
   Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, 
   Petition, WelfareProgram, HealthDrugItem, Notification, 
   Department, ServiceItem
 } from "./types";
+import { mapApplicationFromRow, mapPetitionFromRow } from "./mutations";
 
 export * from "./types";
 export * from "./mutations";
 
-// Backward compatible hooks for components that haven't been refactored
-export function getApplications() { return useSupabase<Application>("applications").data; }
-export function getTenders() { return useSupabase<Tender>("tenders").data; }
-export function getRevenueEntries() { return useSupabase<RevenueEntry>("revenue").data; }
-export function getAnomalies() { return useSupabase<AnomalyAlert>("anomalies").data; }
-export function getLandRecords() { return useSupabase<LandRecord>("land_records").data; }
-export function getPetitions() { return useSupabase<Petition>("petitions").data; }
-export function getWelfarePrograms() { return useSupabase<WelfareProgram>("welfare").data; }
-export function getHealthDrugs() { return useSupabase<HealthDrugItem>("health_drugs").data; }
-export function getNotifications() { return useSupabase<Notification>("notifications").data; }
-export function getDepartments() { return useSupabase<Department>("departments").data; }
-export function getServices() { return useSupabase<ServiceItem>("services").data; }
+export function useApplications() {
+  const result = useSupabase<Record<string, unknown>>("applications", { order: "date", ascending: false });
+  const data = useMemo(() => result.data.map(mapApplicationFromRow), [result.data]);
 
-export function getApplicationById(id: string) {
-  // Simple implementation, component will re-render
-  return useSupabase<Application>("applications").data.find(a => a.id === id);
+  return { ...result, data };
 }
 
-export function getUnreadCount() {
-  const notifs = useSupabase<Notification>("notifications").data;
-  return notifs ? notifs.filter(n => !n.read).length : 0;
+export function useApplicationById(id: string) {
+  const result = useApplications();
+  const data = useMemo(() => result.data.find((application) => application.id === id), [id, result.data]);
+
+  return { ...result, data };
+}
+
+export function useTenders() { return useSupabase<Tender>("tenders"); }
+export function useRevenueEntries() { return useSupabase<RevenueEntry>("revenue"); }
+export function useAnomalies() { return useSupabase<AnomalyAlert>("anomalies"); }
+export function useLandRecords() { return useSupabase<LandRecord>("land_records"); }
+export function usePetitions() {
+  const result = useSupabase<Petition & { total_needed?: number }>("petitions");
+  const data = useMemo(() => result.data.map(mapPetitionFromRow), [result.data]);
+
+  return { ...result, data };
+}
+export function useWelfarePrograms() { return useSupabase<WelfareProgram>("welfare"); }
+export function useHealthDrugs() { return useSupabase<HealthDrugItem>("health_drugs"); }
+export function useNotifications() { return useSupabase<Notification>("notifications"); }
+export function useDepartments() { return useSupabase<Department>("departments"); }
+export function useServices() { return useSupabase<ServiceItem>("services"); }
+
+export function useUnreadCount() {
+  const { data } = useNotifications();
+  return data.filter((notification) => !notification.read).length;
 }
