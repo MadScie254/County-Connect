@@ -24,6 +24,7 @@ const steps = [
 export default function ApplicationForm() {
   const { serviceId } = useParams();
   const navigate = useNavigate();
+  const { user, profile } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"mpesa" | "card">("mpesa");
@@ -34,6 +35,11 @@ export default function ApplicationForm() {
   const [address, setAddress] = useState("");
   const [subCounty, setSubCounty] = useState("Westlands");
   const [ward, setWard] = useState("Kilimani");
+
+  // File Upload State
+  const [isUploading, setIsUploading] = useState(false);
+  const [businessCert, setBusinessCert] = useState<File | null>(null);
+  const [kraPinCert, setKraPinCert] = useState<File | null>(null);
 
   const handleNext = () => {
     if (currentStep < steps.length) {
