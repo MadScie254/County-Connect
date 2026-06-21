@@ -6,7 +6,7 @@ export interface Profile {
   email: string;
   phone_number?: string;
   national_id?: string;
-  role: "citizen" | "admin" | "business";
+  role: "citizen" | "admin" | "business" | "super_admin";
   avatar_url?: string;
 }
 

@@ -153,14 +153,14 @@ export default function UserProfile() {
                   <label htmlFor="phone-number" className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input id="phone-number" type="tel" value={profile.phone} onChange={(event) => setProfile((current: CitizenProfile) => ({ ...current, phone: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="Phone number" placeholder="0712 345 678" />
+                    <input id="phone-number" type="tel" value={formData.phone_number} onChange={(event) => setFormData((current) => ({ ...current, phone_number: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="Phone number" placeholder="0712 345 678" />
                   </div>
                 </div>
                 <div className="sm:col-span-2">
                   <label htmlFor="physical-address" className="block text-sm font-medium text-gray-700 mb-1">Physical Address</label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input id="physical-address" type="text" value={profile.address} onChange={(event) => setProfile((current: CitizenProfile) => ({ ...current, address: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="Physical address" placeholder="P.O. Box 12345, Nairobi" />
+                    <input id="physical-address" type="text" value={formData.address} onChange={(event) => setFormData((current) => ({ ...current, address: event.target.value }))} className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" title="Physical address" placeholder="P.O. Box 12345, Nairobi" />
                   </div>
                 </div>
               </div>
