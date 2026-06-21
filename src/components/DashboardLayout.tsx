@@ -25,8 +25,8 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { getSelectedCounty } from "@/lib/counties";
-import { CURRENT_CITIZEN } from "@/lib/profile";
 import { logout } from "@/lib/auth";
+import { useAuth } from "@/context/AuthContext";
 import { useSupabase } from "@/hooks/useSupabase";
 import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
@@ -38,6 +38,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, role }: DashboardLayoutProps) {
   const { data: notifications } = useSupabase<Notification>("notifications");
+  const { user, profile } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const selectedCounty = getSelectedCounty();
@@ -125,15 +126,19 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
                       {role === "admin" ? "Administration" : "Citizen Portal"}
                     </p>
                     <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 border border-gray-100">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs">
-                          {role === "admin" ? "AD" : CURRENT_CITIZEN.initials}
-                      </div>
+                      {profile?.avatar_url ? (
+                        <img src={profile.avatar_url} alt="Profile" className="w-8 h-8 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs uppercase">
+                          {role === "admin" ? "AD" : profile?.name?.slice(0, 2) || "U"}
+                        </div>
+                      )}
                       <div className="overflow-hidden">
                         <p className="text-sm font-medium truncate">
-                            {role === "admin" ? "Admin User" : CURRENT_CITIZEN.fullName}
+                            {role === "admin" ? "Admin User" : profile?.name || "Citizen"}
                         </p>
                         <p className="text-xs text-gray-500 truncate">
-                            {role === "admin" ? `admin@${selectedCounty.slug}.go.ke` : CURRENT_CITIZEN.email}
+                            {role === "admin" ? `admin@${selectedCounty.slug}.go.ke` : user?.email}
                         </p>
                       </div>
                     </div>

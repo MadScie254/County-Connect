@@ -4,7 +4,7 @@ import { ArrowUpRight, Clock, FileCheck, AlertCircle, Plus, Building2, Globe, Ca
 import { Link } from "react-router-dom";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { getSelectedCounty } from "@/lib/counties";
-import { CURRENT_CITIZEN } from "@/lib/profile";
+import { useAuth } from "@/context/AuthContext";
 
 import { useSupabase } from "@/hooks/useSupabase";
 import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
@@ -20,7 +20,11 @@ const services = [
 
 export default function CitizenDashboard() {
   const selectedCounty = getSelectedCounty();
-  const allApplications = getApplications().filter((app) => app.applicantId === CURRENT_CITIZEN.idNumber);
+  const { profile } = useAuth();
+  
+  // Using active profile ID for real data filtering, fallback for UI mock stability:
+  const activeNationalId = profile?.national_id || "24567890";
+  const allApplications = getApplications().filter((app) => app.applicantId === activeNationalId);
   const recentApplications = allApplications.slice(0, 3);
   
   const inProgressCount = allApplications.filter((app) => app.status === "Pending Review").length;
