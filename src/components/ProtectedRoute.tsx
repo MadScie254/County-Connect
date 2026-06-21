@@ -28,12 +28,11 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
     return <>{children}</>;
   }
 
-  // Currently, the frontend role checks for "admin" (which we can map to county_admin) or "citizen"
-  const mappedUserRole = profile?.role === "admin" ? "admin" : "citizen";
+  // Non-admin users (citizen, business) only access citizen routes
+  const mappedUserRole = "citizen" as const;
 
   if (mappedUserRole !== role) {
-    // Logged in but wrong role
-    return <Navigate to={mappedUserRole === "admin" ? "/admin" : "/dashboard"} replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
