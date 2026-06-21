@@ -59,38 +59,63 @@ export default function ApplicationForm() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsSubmitting(true);
-    
-    // Create Application
-    addApplication({
-      applicant: CURRENT_CITIZEN.fullName,
-      applicantId: CURRENT_CITIZEN.idNumber,
-      applicantEmail: CURRENT_CITIZEN.email,
-      applicantPhone: CURRENT_CITIZEN.phone,
-      service: "Single Business Permit",
-      amount: 15000,
-      businessName: businessName || "New Business Ltd",
-      ward: ward,
-      subCounty: subCounty,
-      address: address || "P.O. Box 123",
-      type: "business"
-    });
+    setIsUploading(true);
 
-    // Create Revenue Entry
-    addRevenueEntry({
-      ref: `RC-${Date.now().toString().slice(-6)}`,
-      amount: 15000,
-      user: CURRENT_CITIZEN.fullName,
-      stream: "Business Permit",
-      time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-      reconciled: false
-    });
+    try {
+      let businessCertPath = "";
+      let kraPinCertPath = "";
 
-    setTimeout(() => {
+      if (businessCert) {
+        const res = await uploadFileToBucket(businessCert, "applications-documents");
+        businessCertPath = res.path;
+      }
+      if (kraPinCert) {
+        const res = await uploadFileToBucket(kraPinCert, "applications-documents");
+        kraPinCertPath = res.path;
+      }
+
+      // Create Application
+      await addApplication({
+        applicant: profile?.name || "Citizen",
+        applicantId: profile?.national_id || "24567890",
+        applicantEmail: user?.email || "test@example.com",
+        applicantPhone: profile?.phone_number || "254700000000",
+        service: "Single Business Permit",
+        amount: 15000,
+        businessName: businessName || "New Business Ltd",
+        ward: ward,
+        subCounty: subCounty,
+        address: address || "P.O. Box 123",
+        type: "business",
+        documents: {
+          businessCert: businessCertPath,
+          kraPinCert: kraPinCertPath
+        }
+      });
+
+      // Create Revenue Entry
+      await addRevenueEntry({
+        ref: `RC-${Date.now().toString().slice(-6)}`,
+        amount: 15000,
+        user: profile?.name || "Citizen",
+        stream: "Business Permit",
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        reconciled: false
+      });
+
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setIsUploading(false);
+        navigate("/dashboard");
+      }, 1500);
+
+    } catch (e) {
+      console.error(e);
       setIsSubmitting(false);
-      navigate("/dashboard");
-    }, 1500);
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -200,16 +225,18 @@ export default function ApplicationForm() {
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold text-gray-900">Required Documents</h3>
                 <div className="space-y-4">
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer">
+                  <label className="block border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
+                    <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={(e) => setBusinessCert(e.target.files?.[0] || null)} />
                     <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm font-medium text-gray-900">Upload Business Registration Certificate</p>
-                    <p className="text-xs text-gray-500">PDF or JPG up to 5MB</p>
-                  </div>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer">
+                    <p className="text-xs text-gray-500">{businessCert ? businessCert.name : "PDF or JPG up to 5MB"}</p>
+                  </label>
+                  <label className="block border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
+                    <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={(e) => setKraPinCert(e.target.files?.[0] || null)} />
                     <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm font-medium text-gray-900">Upload KRA PIN Certificate</p>
-                    <p className="text-xs text-gray-500">PDF or JPG up to 5MB</p>
-                  </div>
+                    <p className="text-xs text-gray-500">{kraPinCert ? kraPinCert.name : "PDF or JPG up to 5MB"}</p>
+                  </label>
                 </div>
               </div>
             )}
