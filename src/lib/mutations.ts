@@ -28,6 +28,18 @@ export async function updateService(id: number, updates: Partial<ServiceItem>) {
   await supabase.from('services').update(updates).eq('id', id);
 }
 
+export async function uploadFileToBucket(file: File, bucket: 'avatars' | 'applications-documents', path?: string) {
+  const fileName = path || `${Date.now()}_${file.name}`;
+  const { data, error } = await supabase.storage.from(bucket).upload(fileName, file, {
+    cacheControl: '3600',
+    upsert: true
+  });
+  if (error) throw error;
+  
+  const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(data.path);
+  return { path: data.path, publicUrl: publicData?.publicUrl };
+}
+
 export async function removeService(id: number) {
   await supabase.from('services').delete().eq('id', id);
 }
