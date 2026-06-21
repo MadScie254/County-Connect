@@ -1,38 +1,73 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { User, Mail, Phone, MapPin, Save, Camera } from "lucide-react";
-import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
-import { CURRENT_CITIZEN, type CitizenProfile } from "@/lib/profile";
+import { useRef, useState, type ChangeEvent, type FormEvent, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { uploadFileToBucket } from "@/lib/mutations";
+import { supabase } from "@/lib/supabase";
 
 export default function UserProfile() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user, profile, refreshProfile } = useAuth();
+  
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [saveMessage, setSaveMessage] = useState("");
-  const [profile, setProfile] = useState<CitizenProfile>(() => {
-    if (typeof window === "undefined") {
-      return CURRENT_CITIZEN;
-    }
-
-    const storedProfile = window.localStorage.getItem("countyconnect:citizen-profile");
-
-    if (!storedProfile) {
-      return CURRENT_CITIZEN;
-    }
-
-    try {
-      return { ...CURRENT_CITIZEN, ...JSON.parse(storedProfile) };
-    } catch {
-      return CURRENT_CITIZEN;
-    }
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    name: "",
+    phone_number: "",
+    national_id: "",
+    address: ""
   });
 
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault();
-
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("countyconnect:citizen-profile", JSON.stringify(profile));
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        name: profile.name || "",
+        phone_number: profile.phone_number || "",
+        national_id: profile.national_id || "",
+        address: "" // Address isn't in generic profile currently, could add to DB later
+      });
+      setAvatarPreview(profile.avatar_url || null);
     }
+  }, [profile]);
 
-    setSaveMessage("Profile saved locally for this browser session.");
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!profile?.id) return;
+    
+    setIsSaving(true);
+    setSaveMessage("");
+
+    try {
+      let finalAvatarUrl = profile.avatar_url;
+      
+      if (avatarFile) {
+        const { publicUrl } = await uploadFileToBucket(avatarFile, "avatars", `${profile.id}_${Date.now()}`);
+        finalAvatarUrl = publicUrl;
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          name: formData.name,
+          phone_number: formData.phone_number,
+          national_id: formData.national_id,
+          avatar_url: finalAvatarUrl,
+        })
+        .eq("id", profile.id);
+
+      if (error) throw error;
+
+      await refreshProfile();
+      setSaveMessage("Profile saved successfully to Supabase.");
+    } catch (error) {
+      console.error(error);
+      setSaveMessage("Error saving profile.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAvatarClick = () => {
@@ -46,6 +81,7 @@ export default function UserProfile() {
       return;
     }
 
+    setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
     setSaveMessage(`Selected avatar: ${file.name}`);
   };
