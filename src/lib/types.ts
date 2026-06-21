@@ -1,5 +1,15 @@
 // County Connect — Shared Types
 
+export interface Profile {
+  id: string;
+  name: string;
+  email: string;
+  phone_number?: string;
+  national_id?: string;
+  role: "citizen" | "admin" | "business";
+  avatar_url?: string;
+}
+
 // ─── Types ───────────────────────────────────────────────────────────
 export interface Application {
   id: string;
@@ -16,6 +26,11 @@ export interface Application {
   subCounty?: string;
   address?: string;
   type: "citizen" | "business";
+  documents?: {
+    businessCert?: string;
+    kraPinCert?: string;
+    identityCard?: string;
+  };
 }
 
 export interface Tender {

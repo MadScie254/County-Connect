@@ -1,7 +1,6 @@
 import { Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -9,41 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
-  const [session, setSession] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string>("citizen");
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session) {
-        fetchProfile(session.user.id);
-      } else {
-        setLoading(false);
-      }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session) {
-        fetchProfile(session.user.id);
-      } else {
-        setLoading(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  async function fetchProfile(userId: string) {
-    const { data } = await supabase.from('profiles').select('role').eq('id', userId).single();
-    if (data && data.role) {
-      setUserRole(data.role);
-    }
-    setLoading(false);
-  }
+  const { user, profile, loading } = useAuth();
 
   if (loading) {
     return (
@@ -53,18 +18,18 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
     );
   }
 
-  if (!session) {
+  if (!user) {
     // Not logged in
     return <Navigate to={`/login${role === "admin" ? "?role=admin" : ""}`} replace />;
   }
 
   // Superuser bypass
-  if (session.user.email === "danielwanjalamachimbo@gmail.com" || userRole === "super_admin") {
+  if (user.email === "danielwanjalamachimbo@gmail.com" || profile?.role === "admin" || profile?.role === "super_admin") {
     return <>{children}</>;
   }
 
   // Currently, the frontend role checks for "admin" (which we can map to county_admin) or "citizen"
-  const mappedUserRole = userRole === "county_admin" || userRole === "admin" ? "admin" : "citizen";
+  const mappedUserRole = profile?.role === "admin" ? "admin" : "citizen";
 
   if (mappedUserRole !== role) {
     // Logged in but wrong role
