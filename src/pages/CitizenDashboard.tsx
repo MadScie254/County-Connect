@@ -37,7 +37,7 @@ export default function CitizenDashboard() {
         {/* Welcome Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Welcome back, {CURRENT_CITIZEN.firstName}!</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Welcome back, {profile?.name ? profile.name.split(' ')[0] : 'Citizen'}!</h2>
             <p className="text-gray-500">Here's what's happening with your applications in {selectedCounty.name}.</p>
           </div>
           <Link
