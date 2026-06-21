@@ -25,7 +25,7 @@ import ExecutiveAnalytics from "@/pages/ExecutiveAnalytics";
 import PublicHealth from "@/pages/PublicHealth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { LiveAlerts } from "@/components/LiveAlerts";
-
+import { AuthProvider } from "@/context/AuthContext";
 
 export default function App() {
   useEffect(() => {
@@ -33,8 +33,9 @@ export default function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <Routes>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
