@@ -223,6 +223,7 @@ export default function ApplicationForm() {
                       {profile?.national_id ? ` · ID ${profile.national_id}` : ""}
                     </div>
                   )}
+                  {isBusinessService && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Business Activity</label>
                     <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
@@ -233,6 +234,7 @@ export default function ApplicationForm() {
                       <option>Transport</option>
                     </select>
                   </div>
+                  )}
                 </div>
               </div>
             )}

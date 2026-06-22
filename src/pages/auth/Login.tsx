@@ -1,4 +1,4 @@
-import { ShieldCheck, Mail, Lock, ArrowRight, Loader2, Building2 } from "lucide-react";
+import { ShieldCheck, Mail, Lock, ArrowRight, Loader2, Building2, AlertCircle } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState, type FormEvent } from "react";
 import {
@@ -10,11 +10,15 @@ import {
 } from "@/lib/counties";
 
 import { supabase } from "@/lib/supabase";
+import { syncProfileCounty } from "@/lib/mutations";
+import { useToast } from "@/context/ToastContext";
 
 export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const { showToast } = useToast();
   const [role, setRole] = useState<"citizen" | "admin">(
     searchParams.get("role") === "admin" ? "admin" : "citizen",
   );
@@ -31,6 +35,7 @@ export default function Login() {
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage("");
     setSelectedCounty(selectedCounty.slug);
     
     const formData = new FormData(e.target as HTMLFormElement);
@@ -48,6 +53,15 @@ export default function Login() {
         throw error;
       }
 
+      if (data.user?.id) {
+        await syncProfileCounty(data.user.id, selectedCounty.slug);
+      }
+
+      showToast({
+        type: "success",
+        title: "Welcome back",
+        message: `Signed in to ${selectedCounty.name}.`,
+      });
 
       if (role === "admin") {
         navigate(`/admin`);
@@ -55,8 +69,9 @@ export default function Login() {
         navigate(`/dashboard`);
       }
     } catch (err: any) {
-      console.error("Login error:", err.message);
-      alert(err.message || "Failed to sign in. Please check your credentials.");
+      const message = err.message || "Failed to sign in. Please check your credentials.";
+      setErrorMessage(message);
+      showToast({ type: "error", title: "Sign in failed", message });
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +79,11 @@ export default function Login() {
 
   const handleProviderLogin = (provider: "google" | "ecitizen") => {
     setSelectedCounty(selectedCounty.slug);
-    alert(`${provider} login flow will be integrated in Phase 4.`);
+    showToast({
+      type: "info",
+      title: "Coming soon",
+      message: `${provider === "google" ? "Google" : "eCitizen"} sign-in will be available in a future release.`,
+    });
   };
 
   return (
@@ -147,6 +166,12 @@ export default function Login() {
           </div>
 
           <form className="space-y-6" onSubmit={handleLogin}>
+            {errorMessage && (
+              <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <p>{errorMessage}</p>
+              </div>
+            )}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
