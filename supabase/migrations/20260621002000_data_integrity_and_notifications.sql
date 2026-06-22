@@ -43,3 +43,21 @@ CREATE POLICY "Admins can insert notifications" ON public.notifications
         AND role IN ('admin', 'super_admin')
     )
   );
+
+-- Persist county on signup.
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, name, email, national_id, phone_number, role, county_slug)
+  VALUES (
+    new.id,
+    new.raw_user_meta_data->>'name',
+    new.email,
+    new.raw_user_meta_data->>'national_id',
+    new.raw_user_meta_data->>'phone_number',
+    COALESCE(new.raw_user_meta_data->>'role', 'citizen'),
+    new.raw_user_meta_data->>'county_slug'
+  );
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

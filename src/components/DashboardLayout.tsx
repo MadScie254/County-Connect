@@ -35,8 +35,8 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, role }: DashboardLayoutProps) {
-  const { data: notifications } = useMyNotifications(user?.id);
   const { user, profile } = useAuth();
+  const { data: notifications } = useMyNotifications(user?.id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const selectedCounty = getSelectedCounty();

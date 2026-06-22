@@ -19,8 +19,20 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { SERVICE_CATALOG } from "@/lib/serviceCatalog";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
+
+const SERVICE_ICONS: Record<string, typeof Store> = {
+  sbp: Store,
+  "land-registry": Building2,
+  parking: Car,
+  construction: HardHat,
+  "kra-bridge": ShieldCheck,
+  welfare: Users,
+  "health-portal": HeartPulse,
+  legal: Scale,
+};
 
 const categories = [
   { id: "all", name: "All Services", icon: Globe },
@@ -31,80 +43,11 @@ const categories = [
   { id: "social", name: "Welfare & Health", icon: HeartPulse },
 ];
 
-const services = [
-  {
-    id: "sbp",
-    name: "Single Business Permit (SBP)",
-    category: "business",
-    icon: Store,
-    desc: "End-to-end application, renewal, and compliance tracking for businesses.",
-    fee: "From KES 5,000",
-    hot: true,
-  },
-  {
-    id: "land-registry",
-    name: "Digital Land Registry",
-    category: "land",
-    icon: Building2,
-    desc: "Verify parcel records, title deeds, and transfer history on immutable ledger.",
-    fee: "KES 500 per search",
-  },
-  {
-    id: "parking",
-    name: "Daily/Seasonal Parking",
-    category: "finance",
-    icon: Car,
-    desc: "Instant parking fee payment with real-time enforcement verification.",
-    fee: "KES 200 / day",
-  },
-  {
-    id: "construction",
-    name: "Architectural Approvals",
-    category: "construction",
-    icon: HardHat,
-    desc: "Submit building plans for county approval and track progress.",
-    fee: "0.1% of estimated cost",
-  },
-  {
-    id: "kra-bridge",
-    name: "KRA Tax Bridge",
-    category: "finance",
-    icon: ShieldCheck,
-    desc: "Lightweight SME dashboard for iTax filings and liability management.",
-    fee: "Free for SMEs",
-    new: true,
-  },
-  {
-    id: "welfare",
-    name: "Social Welfare Benefits",
-    category: "social",
-    icon: Users,
-    desc: "Register as a beneficiary for county welfare programs and manage disbursements.",
-    fee: "Free",
-  },
-  {
-    id: "health-portal",
-    name: "Health Facility Portal",
-    category: "social",
-    icon: HeartPulse,
-    desc: "Book appointments and access medical records from county Level 2/3 facilities.",
-    fee: "Subsidized",
-  },
-  {
-    id: "legal",
-    name: "Legal Services / Petitions",
-    category: "all",
-    icon: Scale,
-    desc: "Submit public participation input or file a formal complaint/grievance.",
-    fee: "Free",
-  },
-];
-
 export default function ServiceCatalog() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredServices = services.filter((service) => {
+  const filteredServices = SERVICE_CATALOG.filter((service) => {
     const matchesCategory = selectedCategory === "all" || service.category === selectedCategory;
     const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           service.desc.toLowerCase().includes(searchQuery.toLowerCase());
@@ -164,7 +107,10 @@ export default function ServiceCatalog() {
 
         {/* Services Grid */}
         <div id="services-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredServices.map((service, idx) => (
+          {filteredServices.map((service, idx) => {
+            const ServiceIcon = SERVICE_ICONS[service.id] ?? Globe;
+
+            return (
             <motion.div
               key={service.id}
               initial={{ opacity: 0, y: 20 }}
@@ -184,7 +130,7 @@ export default function ServiceCatalog() {
               )}
               
               <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 transform group-hover:rotate-6">
-                <service.icon className="w-7 h-7" />
+                <ServiceIcon className="w-7 h-7" />
               </div>
               
               <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight group-hover:text-emerald-700 transition-colors">
@@ -210,7 +156,8 @@ export default function ServiceCatalog() {
                 </Link>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
 
         {filteredServices.length === 0 && (

@@ -17,9 +17,10 @@ import { motion } from "motion/react";
 import { useSupabase } from "@/hooks/useSupabase";
 import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
-import { CURRENT_CITIZEN } from "@/lib/profile";
+import { useAuth } from "@/context/AuthContext";
 
 export default function TaxCompliance() {
+  const { profile } = useAuth();
   const [revenue, setRevenue] = useState("0");
   const [expenses, setExpenses] = useState("0");
    const [showAllRecords, setShowAllRecords] = useState(false);
@@ -36,7 +37,7 @@ export default function TaxCompliance() {
       addRevenueEntry({
         ref: `TX${Date.now().toString().slice(-6)}`,
         amount: estimatedTax,
-        user: CURRENT_CITIZEN.fullName,
+        user: profile?.name || "Citizen",
         stream: "SME Tax Payment",
         time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         reconciled: false,

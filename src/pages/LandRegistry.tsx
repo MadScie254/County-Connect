@@ -14,12 +14,13 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { CURRENT_CITIZEN } from "@/lib/profile";
+import { useAuth } from "@/context/AuthContext";
 import { useSupabase } from "@/hooks/useSupabase";
 import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 
 export default function LandRegistry() {
+  const { profile } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -35,7 +36,7 @@ export default function LandRegistry() {
     setTimeout(() => {
       setIsVerifying(false);
       setVerificationResult({
-        owner: CURRENT_CITIZEN.fullName,
+        owner: profile?.name || "Citizen",
         status: "Verified",
         confidence: "99.8% match",
         lastTransfer: "Recorded 14 days ago",

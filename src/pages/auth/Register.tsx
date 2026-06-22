@@ -1,4 +1,4 @@
-import { ShieldCheck, Mail, Lock, User, ArrowRight, Loader2, Phone, Building2 } from "lucide-react";
+import { ShieldCheck, Mail, Lock, User, ArrowRight, Loader2, Phone, Building2, AlertCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, type FormEvent } from "react";
 import {
@@ -10,16 +10,20 @@ import {
 } from "@/lib/counties";
 
 import { supabase } from "@/lib/supabase";
+import { useToast } from "@/context/ToastContext";
 
 export default function Register() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const { showToast } = useToast();
   const [countySlug, setCountySlug] = useState(getSelectedCountySlug());
   const selectedCounty = getCountyBySlug(countySlug) ?? getDefaultCounty();
 
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage("");
     setSelectedCounty(selectedCounty.slug);
     
     const formData = new FormData(e.target as HTMLFormElement);
@@ -39,7 +43,8 @@ export default function Register() {
             name: `${firstName} ${lastName}`,
             national_id: nationalId,
             phone_number: phone,
-            role: "citizen"
+            role: "citizen",
+            county_slug: selectedCounty.slug,
           }
         }
       });
@@ -48,11 +53,25 @@ export default function Register() {
         throw error;
       }
 
-
-      navigate(`/dashboard`);
+      if (data.session) {
+        showToast({
+          type: "success",
+          title: "Account created",
+          message: `Welcome to ${selectedCounty.name}.`,
+        });
+        navigate("/dashboard");
+      } else {
+        showToast({
+          type: "info",
+          title: "Check your email",
+          message: "We sent a confirmation link. You can sign in once your email is verified.",
+        });
+        navigate("/login");
+      }
     } catch (err: any) {
-      console.error("Registration error:", err.message);
-      alert(err.message || "Failed to create account. Please try again.");
+      const message = err.message || "Failed to create account. Please try again.";
+      setErrorMessage(message);
+      showToast({ type: "error", title: "Registration failed", message });
     } finally {
       setIsLoading(false);
     }
@@ -111,6 +130,12 @@ export default function Register() {
           </div>
 
           <form className="space-y-6" onSubmit={handleRegister}>
+            {errorMessage && (
+              <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <p>{errorMessage}</p>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
