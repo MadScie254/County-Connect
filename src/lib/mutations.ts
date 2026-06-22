@@ -115,8 +115,41 @@ export async function addApplication(app: Partial<Application>) {
   return data ? mapApplicationFromRow(data) : newApp;
 }
 
-export async function updateApplicationStatus(id: string, status: string) {
+export async function updateApplicationStatus(id: string, status: Application["status"], applicantUserId?: string) {
   const { error } = await supabase.from("applications").update({ status }).eq("id", id);
+  if (error) throw error;
+
+  if (applicantUserId) {
+    const notificationType =
+      status === "Approved" ? "success" :
+      status === "Rejected" ? "error" :
+      status === "Changes Requested" ? "warning" :
+      "info";
+
+    await createNotification({
+      userId: applicantUserId,
+      title: `Application ${status}`,
+      message: `Your application ${id} has been updated to "${status}".`,
+      type: notificationType,
+    });
+  }
+}
+
+export async function createNotification(params: {
+  userId: string;
+  title: string;
+  message: string;
+  type: "success" | "warning" | "info" | "error";
+}) {
+  const { error } = await supabase.from("notifications").insert({
+    user_id: params.userId,
+    title: params.title,
+    message: params.message,
+    type: params.type,
+    date: new Date().toISOString(),
+    read: false,
+  });
+
   if (error) throw error;
 }
 
@@ -166,8 +199,22 @@ export async function votePetition(id: number) {
   }
 }
 
-export async function markAllNotificationsRead() {
-  const { error } = await supabase.from('notifications').update({ read: true }).eq('read', false);
+export async function markAllNotificationsRead(userId: string) {
+  const { error } = await supabase
+    .from("notifications")
+    .update({ read: true })
+    .eq("read", false)
+    .eq("user_id", userId);
+
+  if (error) throw error;
+}
+
+export async function syncProfileCounty(userId: string, countySlug: string) {
+  const { error } = await supabase
+    .from("profiles")
+    .update({ county_slug: countySlug })
+    .eq("id", userId);
+
   if (error) throw error;
 }
 

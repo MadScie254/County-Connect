@@ -17,6 +17,18 @@ export function useApplications() {
   return { ...result, data };
 }
 
+export function useMyApplications(userId?: string) {
+  const result = useSupabase<Record<string, unknown>>("applications", {
+    order: "date",
+    ascending: false,
+    filters: userId ? [{ column: "user_id", operator: "eq", value: userId }] : undefined,
+    enabled: Boolean(userId),
+  });
+  const data = useMemo(() => result.data.map(mapApplicationFromRow), [result.data]);
+
+  return { ...result, data };
+}
+
 export function useApplicationById(id: string) {
   const result = useApplications();
   const data = useMemo(() => result.data.find((application) => application.id === id), [id, result.data]);
@@ -37,10 +49,20 @@ export function usePetitions() {
 export function useWelfarePrograms() { return useSupabase<WelfareProgram>("welfare"); }
 export function useHealthDrugs() { return useSupabase<HealthDrugItem>("health_drugs"); }
 export function useNotifications() { return useSupabase<Notification>("notifications"); }
+
+export function useMyNotifications(userId?: string) {
+  return useSupabase<Notification>("notifications", {
+    order: "date",
+    ascending: false,
+    filters: userId ? [{ column: "user_id", operator: "eq", value: userId }] : undefined,
+    enabled: Boolean(userId),
+  });
+}
+
 export function useDepartments() { return useSupabase<Department>("departments"); }
 export function useServices() { return useSupabase<ServiceItem>("services"); }
 
-export function useUnreadCount() {
-  const { data } = useNotifications();
+export function useUnreadCount(userId?: string) {
+  const { data } = useMyNotifications(userId);
   return data.filter((notification) => !notification.read).length;
 }

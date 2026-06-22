@@ -19,20 +19,16 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
   }
 
   if (!user) {
-    // Not logged in
     return <Navigate to={`/login${role === "admin" ? "?role=admin" : ""}`} replace />;
   }
 
   const isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
 
-  if (role === "admin" && isAdmin) {
+  if (isAdmin) {
     return <>{children}</>;
   }
 
-  // Non-admin users (citizen, business) only access citizen routes
-  const mappedUserRole = "citizen" as const;
-
-  if (mappedUserRole !== role) {
+  if (role === "admin") {
     return <Navigate to="/dashboard" replace />;
   }
 

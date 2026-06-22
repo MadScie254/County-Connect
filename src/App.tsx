@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect } from "react";
 import LandingPage from "@/pages/LandingPage";
 import CitizenDashboard from "@/pages/CitizenDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
@@ -25,16 +24,16 @@ import ExecutiveAnalytics from "@/pages/ExecutiveAnalytics";
 import PublicHealth from "@/pages/PublicHealth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { LiveAlerts } from "@/components/LiveAlerts";
+import { ConfigBanner } from "@/components/ConfigBanner";
 import { AuthProvider } from "@/context/AuthContext";
+import { ToastProvider } from "@/context/ToastContext";
 
 export default function App() {
-  useEffect(() => {
-    // Supabase will now handle all data reactively
-  }, []);
-
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <ToastProvider>
+      <AuthProvider>
+        <ConfigBanner />
+        <BrowserRouter>
         <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
@@ -71,7 +70,8 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <LiveAlerts />
-      </BrowserRouter>
-    </AuthProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </ToastProvider>
   );
 }

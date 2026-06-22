@@ -1,4 +1,4 @@
-import { useApplications } from "@/lib/store";
+import { useMyApplications } from "@/lib/store";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ArrowUpRight, Clock, FileCheck, AlertCircle, Plus, Building2, Globe, Car, HardHat, Coins, HeartPulse, MessageSquare, Store } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -18,13 +18,8 @@ const services = [
 export default function CitizenDashboard() {
   const selectedCounty = getSelectedCounty();
   const { user, profile } = useAuth();
-  const { data: applications } = useApplications();
+  const { data: allApplications, loading, error } = useMyApplications(user?.id);
   
-  // Using active profile ID for real data filtering, fallback for UI mock stability:
-  const activeNationalId = profile?.national_id || "24567890";
-  const allApplications = applications.filter((app) => (
-    app.userId ? app.userId === user?.id : app.applicantId === activeNationalId
-  ));
   const recentApplications = allApplications.slice(0, 3);
   
   const inProgressCount = allApplications.filter((app) => app.status === "Pending Review").length;
@@ -87,10 +82,22 @@ export default function CitizenDashboard() {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex items-center justify-between">
             <h3 className="font-semibold text-gray-900">Recent Activity</h3>
-            <Link to="/applications" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium flex items-center">
-              View All <ArrowUpRight className="w-4 h-4 ml-1" />
+            <Link to="/applications/new" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium flex items-center">
+              Browse Services <ArrowUpRight className="w-4 h-4 ml-1" />
             </Link>
           </div>
+          {loading ? (
+            <div className="p-12 text-center text-gray-500">Loading your applications...</div>
+          ) : error ? (
+            <div className="p-12 text-center text-red-600">Could not load applications. Please refresh and try again.</div>
+          ) : recentApplications.length === 0 ? (
+            <div className="p-12 text-center">
+              <p className="text-gray-500 mb-4">You have not submitted any applications yet.</p>
+              <Link to="/applications/new" className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700">
+                <Plus className="w-4 h-4 mr-2" /> Start your first application
+              </Link>
+            </div>
+          ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
               <thead className="bg-gray-50 text-gray-500 font-medium">
@@ -128,6 +135,7 @@ export default function CitizenDashboard() {
               </tbody>
             </table>
           </div>
+          )}
         </div>
 
         {/* Quick Services */}

@@ -27,9 +27,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { getSelectedCounty } from "@/lib/counties";
 import { logout } from "@/lib/auth";
 import { useAuth } from "@/context/AuthContext";
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
+import { useMyNotifications } from "@/lib/store";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -37,7 +35,7 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, role }: DashboardLayoutProps) {
-  const { data: notifications } = useSupabase<Notification>("notifications");
+  const { data: notifications } = useMyNotifications(user?.id);
   const { user, profile } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();

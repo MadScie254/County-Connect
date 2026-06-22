@@ -9,6 +9,7 @@ export interface Profile {
   role: "citizen" | "admin" | "business" | "super_admin";
   avatar_url?: string;
   address?: string;
+  county_slug?: string;
 }
 
 // ─── Types ───────────────────────────────────────────────────────────
@@ -63,6 +64,7 @@ export interface ServiceItem {
 
 export interface Notification {
   id: number;
+  user_id?: string | null;
   title: string;
   message: string;
   type: "success" | "warning" | "info" | "error";

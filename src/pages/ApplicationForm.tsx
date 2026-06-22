@@ -1,13 +1,16 @@
 import { addApplication, addRevenueEntry } from "@/lib/store";
 import { MpesaModal } from "@/components/MpesaModal";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { CheckCircle2, ChevronRight, Upload, CreditCard, AlertCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { motion } from "motion/react";
 import { useAuth } from "@/context/AuthContext";
 import { uploadFileToBucket } from "@/lib/mutations";
+import { getServiceById } from "@/lib/serviceCatalog";
+import { useToast } from "@/context/ToastContext";
+import { getSelectedCounty } from "@/lib/counties";
 
 const steps = [
   { id: 1, name: "Business Details" },
@@ -22,8 +25,13 @@ export default function ApplicationForm() {
   const { serviceId } = useParams();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
+  const { showToast } = useToast();
+  const selectedCounty = getSelectedCounty();
+  const service = useMemo(() => getServiceById(serviceId), [serviceId]);
+  const isBusinessService = service.type === "business";
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"mpesa" | "card">("mpesa");
   const [isMpesaModalOpen, setIsMpesaModalOpen] = useState(false);
   
@@ -39,14 +47,19 @@ export default function ApplicationForm() {
   const [kraPinCert, setKraPinCert] = useState<File | null>(null);
 
   const handleNext = () => {
+    if (currentStep === 1 && isBusinessService && !businessName.trim()) {
+      setSubmitError("Please enter a business name before continuing.");
+      return;
+    }
+
+    setSubmitError("");
+
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
+    } else if (service.amount > 0 && paymentMethod === "mpesa") {
+      setIsMpesaModalOpen(true);
     } else {
-      if (paymentMethod === "mpesa") {
-        setIsMpesaModalOpen(true);
-      } else {
-        handleSubmit();
-      }
+      handleSubmit();
     }
   };
 
@@ -58,12 +71,13 @@ export default function ApplicationForm() {
 
   const handleSubmit = async () => {
     if (!user?.id) {
-      console.error("Cannot submit an application without an authenticated user.");
+      setSubmitError("You must be signed in to submit an application.");
       return;
     }
 
     setIsSubmitting(true);
     setIsUploading(true);
+    setSubmitError("");
 
     try {
       let businessCertPath = "";
@@ -78,44 +92,52 @@ export default function ApplicationForm() {
         kraPinCertPath = res.path;
       }
 
-      // Create Application
       await addApplication({
         userId: user.id,
         applicant: profile?.name || "Citizen",
-        applicantId: profile?.national_id || "24567890",
-        applicantEmail: user.email || "test@example.com",
-        applicantPhone: profile?.phone_number || "254700000000",
-        service: "Single Business Permit",
-        amount: 15000,
-        businessName: businessName || "New Business Ltd",
-        ward: ward,
-        subCounty: subCounty,
-        address: address || "P.O. Box 123",
-        type: "business",
+        applicantId: profile?.national_id || "",
+        applicantEmail: user.email || "",
+        applicantPhone: profile?.phone_number || "",
+        service: service.name,
+        amount: service.amount,
+        businessName: isBusinessService ? businessName : undefined,
+        ward,
+        subCounty,
+        address: address || profile?.address || "",
+        type: service.type,
         documents: {
-          businessCert: businessCertPath,
-          kraPinCert: kraPinCertPath
-        }
+          businessCert: businessCertPath || undefined,
+          kraPinCert: kraPinCertPath || undefined,
+        },
       });
 
-      // Create Revenue Entry
-      await addRevenueEntry({
-        ref: `RC-${Date.now().toString().slice(-6)}`,
-        amount: 15000,
-        user: profile?.name || "Citizen",
-        stream: "Business Permit",
-        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        reconciled: false
+      if (service.amount > 0) {
+        await addRevenueEntry({
+          ref: `RC-${Date.now().toString().slice(-6)}`,
+          amount: service.amount,
+          user: profile?.name || "Citizen",
+          stream: service.name,
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          reconciled: false,
+        });
+      }
+
+      showToast({
+        type: "success",
+        title: "Application submitted",
+        message: `Your ${service.name} application for ${selectedCounty.name} is now pending review.`,
       });
 
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setIsUploading(false);
-        navigate("/dashboard");
-      }, 1500);
-
-    } catch (e) {
-      console.error(e);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(error);
+      setSubmitError("Something went wrong while submitting your application. Please try again.");
+      showToast({
+        type: "error",
+        title: "Submission failed",
+        message: "We could not save your application. Check your connection and try again.",
+      });
+    } finally {
       setIsSubmitting(false);
       setIsUploading(false);
     }
@@ -125,9 +147,19 @@ export default function ApplicationForm() {
     <DashboardLayout role="citizen">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">New Application</h2>
-          <p className="text-gray-500">Single Business Permit Application</p>
+          <Link to="/applications/new" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+            ← Back to services
+          </Link>
+          <h2 className="text-2xl font-bold text-gray-900 mt-2">New Application</h2>
+          <p className="text-gray-500">{service.name} · {selectedCounty.name}</p>
         </div>
+
+        {submitError && (
+          <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <p>{submitError}</p>
+          </div>
+        )}
 
         {/* Progress Steps */}
         <div className="mb-8">
@@ -171,16 +203,26 @@ export default function ApplicationForm() {
           >
             {currentStep === 1 && (
               <div className="space-y-6">
-                <h3 className="text-lg font-semibold text-gray-900">Business Details</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{isBusinessService ? "Business Details" : "Applicant Details"}</h3>
                 <div className="grid grid-cols-1 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
-                    <input type="text" value={businessName} onChange={e => setBusinessName(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. Acme Traders Ltd" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Registration Number</label>
-                    <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. BN-123456" />
-                  </div>
+                  {isBusinessService && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                        <input type="text" value={businessName} onChange={(e) => setBusinessName(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. Acme Traders Ltd" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Registration Number</label>
+                        <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. BN-123456" />
+                      </div>
+                    </>
+                  )}
+                  {!isBusinessService && (
+                    <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
+                      Applying as <span className="font-semibold text-gray-900">{profile?.name || "Citizen"}</span>
+                      {profile?.national_id ? ` · ID ${profile.national_id}` : ""}
+                    </div>
+                  )}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Business Activity</label>
                     <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
@@ -250,19 +292,21 @@ export default function ApplicationForm() {
                 <div className="bg-gray-50 rounded-lg p-4 space-y-4">
                   <div className="flex justify-between border-b border-gray-200 pb-2">
                     <span className="text-gray-500 text-sm">Service</span>
-                    <span className="font-medium text-gray-900 text-sm">Single Business Permit</span>
+                    <span className="font-medium text-gray-900 text-sm">{service.name}</span>
                   </div>
-                  <div className="flex justify-between border-b border-gray-200 pb-2">
-                    <span className="text-gray-500 text-sm">Business Name</span>
-                    <span className="font-medium text-gray-900 text-sm">{businessName || "N/A"}</span>
-                  </div>
+                  {isBusinessService && (
+                    <div className="flex justify-between border-b border-gray-200 pb-2">
+                      <span className="text-gray-500 text-sm">Business Name</span>
+                      <span className="font-medium text-gray-900 text-sm">{businessName || "N/A"}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between border-b border-gray-200 pb-2">
                     <span className="text-gray-500 text-sm">Location</span>
                     <span className="font-medium text-gray-900 text-sm">{subCounty}, {ward}</span>
                   </div>
                   <div className="flex justify-between pt-2">
                     <span className="text-gray-900 font-semibold">Total Fee</span>
-                    <span className="font-bold text-emerald-600">KES 15,000</span>
+                    <span className="font-bold text-emerald-600">{formatCurrency(service.amount)}</span>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-blue-50 text-blue-700 rounded-lg text-sm">
@@ -277,7 +321,7 @@ export default function ApplicationForm() {
                 <h3 className="text-lg font-semibold text-gray-900">Payment</h3>
                 <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
                   <p className="text-gray-500 mb-2">Amount Due</p>
-                  <p className="text-3xl font-bold text-gray-900 mb-8">KES 15,000</p>
+                  <p className="text-3xl font-bold text-gray-900 mb-8">{formatCurrency(service.amount)}</p>
                   
                   <div className="space-y-4">
                     <button type="button" onClick={() => setPaymentMethod("mpesa")} className="w-full flex items-center justify-between px-4 py-3 border border-emerald-500 bg-emerald-50 text-emerald-700 rounded-lg font-medium">
@@ -324,7 +368,7 @@ export default function ApplicationForm() {
               ) : isSubmitting ? (
                 <>Processing...</>
               ) : currentStep === steps.length ? (
-                <>Pay & Submit</>
+                <>{service.amount > 0 ? "Pay & Submit" : "Submit Application"}</>
               ) : (
                 <>
                   Next Step <ChevronRight className="w-4 h-4 ml-1" />
@@ -338,9 +382,9 @@ export default function ApplicationForm() {
       <MpesaModal 
         isOpen={isMpesaModalOpen} 
         onClose={() => setIsMpesaModalOpen(false)} 
-        amount={15000} 
-        reference={`SBP-${Date.now().toString().slice(-6)}`}
-        description="Single Business Permit"
+        amount={service.amount} 
+        reference={`${service.id.toUpperCase()}-${Date.now().toString().slice(-6)}`}
+        description={service.name}
         onSuccess={handleSubmit} 
       />
     </DashboardLayout>
