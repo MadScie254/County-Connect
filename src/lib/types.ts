@@ -22,13 +22,14 @@ export interface Application {
   applicantPhone: string;
   service: string;
   date: string;
-  status: "Pending Review" | "Approved" | "Rejected" | "Changes Requested";
+  status: "Pending Payment" | "Pending Review" | "Approved" | "Rejected" | "Changes Requested";
   amount: number;
   businessName?: string;
   ward?: string;
   subCounty?: string;
   address?: string;
   type: "citizen" | "business";
+  county_slug?: string;
   documents?: {
     businessCert?: string;
     kraPinCert?: string;
@@ -44,6 +45,7 @@ export interface Tender {
   status: "Open" | "Evaluated" | "Awarded" | "Cancelled";
   deadline: string;
   awardedTo?: string;
+  county_slug?: string;
 }
 
 export interface Department {
@@ -76,10 +78,11 @@ export interface RevenueEntry {
   id: string;
   ref: string;
   amount: number;
-  user: string;
+  payer_name: string;
   stream: string;
-  time: string;
+  created_at: string;
   reconciled: boolean;
+  county_slug?: string;
 }
 
 export interface HealthDrugItem {
@@ -88,6 +91,7 @@ export interface HealthDrugItem {
   facility: string;
   stock: string;
   level: "critical" | "low" | "high";
+  county_slug?: string;
 }
 
 export interface WelfareProgram {
@@ -96,6 +100,7 @@ export interface WelfareProgram {
   status: "Enrolled" | "Waitlist" | "Active" | "Inactive";
   date: string;
   method: string;
+  county_slug?: string;
 }
 
 export interface Petition {

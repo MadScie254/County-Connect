@@ -72,9 +72,7 @@ const COUNTY_PRICING: Record<CountyTier, CountyPackages> = {
   access: { starter: 1800000, standard: 3500000, enterprise: 6500000 },
 };
 
-export function formatCurrency(amount: number) {
-  return `KES ${amount.toLocaleString("en-KE")}`;
-}
+
 
 export function getCountyBySlug(slug: string) {
   return COUNTY_PROFILES.find((county) => county.slug === slug);

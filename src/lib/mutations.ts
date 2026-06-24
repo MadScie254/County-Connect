@@ -191,12 +191,8 @@ export async function removeService(id: number) {
 }
 
 export async function votePetition(id: number) {
-  // Simple RPC or just read/write logic for now
-  const { data } = await supabase.from('petitions').select('supporters').eq('id', id).single();
-  if (data) {
-    const { error } = await supabase.from('petitions').update({ supporters: data.supporters + 1 }).eq('id', id);
-    if (error) throw error;
-  }
+  const { error } = await supabase.rpc('increment_petition_supporters', { petition_id: id });
+  if (error) throw error;
 }
 
 export async function markAllNotificationsRead(userId: string) {
@@ -223,7 +219,3 @@ export async function updateDrugStock(id: number, stock: string, level: string) 
   if (error) throw error;
 }
 
-// Stubs for live simulation
-export function startLiveSimulation() {}
-export function stopLiveSimulation() {}
-export function subscribe(event: string, callback: (data?: any) => void) { return () => {}; }

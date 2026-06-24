@@ -30,8 +30,14 @@ export function useMyApplications(userId?: string) {
 }
 
 export function useApplicationById(id: string) {
-  const result = useApplications();
-  const data = useMemo(() => result.data.find((application) => application.id === id), [id, result.data]);
+  const result = useSupabase<Record<string, unknown>>("applications", {
+    filters: id ? [{ column: "id", operator: "eq", value: id }] : undefined,
+    enabled: Boolean(id),
+  });
+  const data = useMemo(() => {
+    if (!result.data || result.data.length === 0) return null;
+    return mapApplicationFromRow(result.data[0]);
+  }, [result.data]);
 
   return { ...result, data };
 }

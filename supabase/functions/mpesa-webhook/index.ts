@@ -17,7 +17,6 @@ serve(async (req) => {
     // Safaricom Daraja Webhook Payload Structure
     const body = data.Body.stkCallback;
     const resultCode = body.ResultCode;
-    const merchantRequestID = body.MerchantRequestID;
     const checkoutRequestID = body.CheckoutRequestID;
 
     if (resultCode === 0) {
@@ -31,24 +30,42 @@ serve(async (req) => {
       const mpesaReceiptNumber = receiptObj?.Value;
       const phoneNumber = phoneObj?.Value?.toString();
 
-      // Update the revenue table in Supabase
-      // Assuming we stored the CheckoutRequestID or have a pending revenue entry
-      // For now, let's insert a new reconciled revenue entry
-      const { error } = await supabase.from('revenue').insert({
-        id: `REV-${mpesaReceiptNumber}`,
-        ref: mpesaReceiptNumber,
-        amount: amount,
-        "user": phoneNumber || "Unknown Citizen",
-        stream: "M-Pesa API",
-        time: new Date().toLocaleTimeString(),
-        reconciled: true
-      });
+      // Update the payment record in Supabase
+      const { data: payment, error: paymentError } = await supabase
+        .from('payments')
+        .update({ status: 'completed' })
+        .eq('checkout_request_id', checkoutRequestID)
+        .select()
+        .single();
 
-      if (error) {
-        console.error("Supabase insert error:", error);
+      if (paymentError || !payment) {
+        console.error("Payment update error:", paymentError);
+      } else if (payment.application_id) {
+         // Update the application status to "Pending Review" now that payment is done
+         await supabase
+           .from("applications")
+           .update({ status: "Pending Review" })
+           .eq("id", payment.application_id);
+
+         // Record revenue using the new UUID schema
+         const { error: revenueError } = await supabase.from('revenue').insert({
+           ref: mpesaReceiptNumber || checkoutRequestID,
+           amount: amount || payment.amount,
+           payer_name: phoneNumber || payment.phone || "Unknown Citizen",
+           stream: "Digital Services",
+           reconciled: true
+         });
+
+         if (revenueError) {
+           console.error("Supabase revenue insert error:", revenueError);
+         }
       }
     } else {
       console.log(`STK Push failed or cancelled: ${body.ResultDesc}`);
+      await supabase
+        .from('payments')
+        .update({ status: 'failed' })
+        .eq('checkout_request_id', checkoutRequestID);
     }
 
     // Safaricom expects a success response so it doesn't retry

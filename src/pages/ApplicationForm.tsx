@@ -38,8 +38,9 @@ export default function ApplicationForm() {
   // Form State
   const [businessName, setBusinessName] = useState("");
   const [address, setAddress] = useState("");
-  const [subCounty, setSubCounty] = useState("Westlands");
-  const [ward, setWard] = useState("Kilimani");
+  const [subCounty, setSubCounty] = useState("");
+  const [ward, setWard] = useState("");
+  const [createdAppId, setCreatedAppId] = useState<string | null>(null);
 
   // File Upload State
   const [isUploading, setIsUploading] = useState(false);
@@ -56,8 +57,6 @@ export default function ApplicationForm() {
 
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
-    } else if (service.amount > 0 && paymentMethod === "mpesa") {
-      setIsMpesaModalOpen(true);
     } else {
       handleSubmit();
     }
@@ -92,7 +91,7 @@ export default function ApplicationForm() {
         kraPinCertPath = res.path;
       }
 
-      await addApplication({
+      const appResult = await addApplication({
         userId: user.id,
         applicant: profile?.name || "Citizen",
         applicantId: profile?.national_id || "",
@@ -105,30 +104,25 @@ export default function ApplicationForm() {
         subCounty,
         address: address || profile?.address || "",
         type: service.type,
+        status: service.amount > 0 ? "Pending Payment" : "Pending Review",
+        county_slug: selectedCounty.slug,
         documents: {
           businessCert: businessCertPath || undefined,
           kraPinCert: kraPinCertPath || undefined,
         },
       });
 
-      if (service.amount > 0) {
-        await addRevenueEntry({
-          ref: `RC-${Date.now().toString().slice(-6)}`,
-          amount: service.amount,
-          user: profile?.name || "Citizen",
-          stream: service.name,
-          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          reconciled: false,
+      if (service.amount > 0 && paymentMethod === "mpesa") {
+        setCreatedAppId(appResult.id);
+        setIsMpesaModalOpen(true);
+      } else {
+        showToast({
+          type: "success",
+          title: "Application submitted",
+          message: `Your ${service.name} application for ${selectedCounty.name} is now pending review.`,
         });
+        navigate("/dashboard");
       }
-
-      showToast({
-        type: "success",
-        title: "Application submitted",
-        message: `Your ${service.name} application for ${selectedCounty.name} is now pending review.`,
-      });
-
-      navigate("/dashboard");
     } catch (error) {
       console.error(error);
       setSubmitError("Something went wrong while submitting your application. Please try again.");
@@ -141,6 +135,15 @@ export default function ApplicationForm() {
       setIsSubmitting(false);
       setIsUploading(false);
     }
+  };
+
+  const handleMpesaSuccess = () => {
+    showToast({
+      type: "success",
+      title: "Payment Initiated",
+      message: `Your M-Pesa prompt has been sent. The application will be reviewed once payment is confirmed.`,
+    });
+    navigate("/dashboard");
   };
 
   return (
@@ -245,20 +248,11 @@ export default function ApplicationForm() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Sub-County</label>
-                    <select value={subCounty} onChange={e => setSubCounty(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                      <option>Select Sub-County...</option>
-                      <option>Westlands</option>
-                      <option>Kasarani</option>
-                      <option>Langata</option>
-                    </select>
+                    <input type="text" value={subCounty} onChange={e => setSubCounty(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. Central" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Ward</label>
-                    <select value={ward} onChange={e => setWard(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                      <option>Select Ward...</option>
-                      <option>Kilimani</option>
-                      <option>Kileleshwa</option>
-                    </select>
+                    <input type="text" value={ward} onChange={e => setWard(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. Market Ward" />
                   </div>
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Physical Address / Plot No.</label>
@@ -344,7 +338,7 @@ export default function ApplicationForm() {
 
                   <div className="mt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2 text-left">{paymentMethod === "mpesa" ? "M-Pesa Phone Number" : "Card Billing Contact"}</label>
-                    <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="07XX XXX XXX" defaultValue="0712 345 678" />
+                    <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="07XX XXX XXX" />
                   </div>
                 </div>
               </div>
@@ -385,9 +379,10 @@ export default function ApplicationForm() {
         isOpen={isMpesaModalOpen} 
         onClose={() => setIsMpesaModalOpen(false)} 
         amount={service.amount} 
-        reference={`${service.id.toUpperCase()}-${Date.now().toString().slice(-6)}`}
+        reference={`${service.id.toString().toUpperCase()}-${Date.now().toString().slice(-6)}`}
         description={service.name}
-        onSuccess={handleSubmit} 
+        applicationId={createdAppId || ""}
+        onSuccess={handleMpesaSuccess} 
       />
     </DashboardLayout>
   );

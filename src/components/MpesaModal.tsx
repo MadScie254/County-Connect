@@ -8,10 +8,11 @@ interface MpesaModalProps {
   amount: number;
   reference: string;
   description: string;
+  applicationId: string;
   onSuccess?: () => void;
 }
 
-export function MpesaModal({ isOpen, onClose, amount, reference, description, onSuccess }: MpesaModalProps) {
+export function MpesaModal({ isOpen, onClose, amount, reference, description, applicationId, onSuccess }: MpesaModalProps) {
   const [phone, setPhone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "processing" | "success" | "error">("idle");
@@ -32,7 +33,8 @@ export function MpesaModal({ isOpen, onClose, amount, reference, description, on
           amount,
           phone,
           reference,
-          description
+          description,
+          applicationId
         }
       });
 

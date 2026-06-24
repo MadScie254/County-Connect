@@ -50,10 +50,36 @@ serve(async (req) => {
   try {
     assertDarajaConfig();
 
-    const { amount, phone, reference, description } = await req.json();
+    // Authenticate the request
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Missing Authorization header" }), { status: 401, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
+    }
+    
+    // Initialize Supabase client for backend operations
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
 
-    if (!amount || !phone || !reference) {
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
+    }
+
+    const { amount, phone, reference, description, applicationId } = await req.json();
+
+    if (!amount || !phone || !reference || !applicationId) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      });
+    }
+
+    // Basic phone validation
+    if (!/^(07|01|\+2547|\+2541|2547|2541)\d{8}$/.test(phone)) {
+       return new Response(JSON.stringify({ error: "Invalid Kenyan phone number format" }), {
         status: 400,
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
       });
@@ -96,12 +122,29 @@ serve(async (req) => {
 
     const data = await response.json();
 
+    if (response.ok && data.CheckoutRequestID) {
+      // Use service role to insert payment record securely
+      const adminClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+
+      await adminClient.from("payments").insert({
+        checkout_request_id: data.CheckoutRequestID,
+        application_id: applicationId,
+        phone: formattedPhone,
+        amount: Math.ceil(amount),
+        status: "pending"
+      });
+    }
+
     return new Response(JSON.stringify(data), {
       status: response.ok ? 200 : 400,
       headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
     });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
     });

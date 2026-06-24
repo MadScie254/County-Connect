@@ -4,13 +4,13 @@ import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import {
   COUNTY_PROFILES,
-  formatCurrency,
   getCountyBySlug,
   getCountyPackages,
   getDefaultCounty,
   getSelectedCountySlug,
   setSelectedCounty,
 } from "@/lib/counties";
+import { formatCurrency } from "@/lib/utils";
 
 export default function LandingPage() {
   const [selectedCountySlug, setSelectedCountySlug] = useState(getSelectedCountySlug());
