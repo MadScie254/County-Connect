@@ -1,7 +1,4 @@
-import { startLiveSimulation, stopLiveSimulation, subscribe } from "@/lib/store";
 import { useEffect, useState, useCallback } from "react";
-import { useSupabase } from "@/hooks/useSupabase";
-import type { Application, Tender, RevenueEntry, AnomalyAlert, LandRecord, Petition, WelfareProgram, HealthDrugItem, Notification, Department,  } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 import { CheckCircle2, AlertTriangle, Info, X } from "lucide-react";
 
@@ -59,21 +56,32 @@ export function LiveAlerts() {
   }, []);
 
   useEffect(() => {
-    startLiveSimulation();
+    const channel = supabase
+      .channel("public:notifications")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications" },
+        (payload) => {
+          const newNotification = payload.new as any;
+          const alert: LiveAlert = {
+            id: newNotification.id,
+            title: newNotification.title,
+            message: newNotification.message,
+            type: newNotification.type || "info",
+            timestamp: newNotification.date || new Date().toISOString(),
+          };
+          setAlerts((prev) => [...prev.slice(-4), alert]); // keep max 5
 
-    const unsubscribe = subscribe("live:alert", (data) => {
-      const alert = data as LiveAlert;
-      setAlerts((prev) => [...prev.slice(-4), alert]); // keep max 5
-
-      // Auto-dismiss after 8 seconds
-      setTimeout(() => {
-        dismiss(alert.id);
-      }, 8000);
-    });
+          // Auto-dismiss after 8 seconds
+          setTimeout(() => {
+            dismiss(alert.id);
+          }, 8000);
+        }
+      )
+      .subscribe();
 
     return () => {
-      unsubscribe();
-      stopLiveSimulation();
+      supabase.removeChannel(channel);
     };
   }, [dismiss]);
 
