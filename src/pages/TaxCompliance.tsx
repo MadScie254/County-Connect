@@ -10,7 +10,8 @@ import {
   CheckCircle2, 
   Smartphone,
   Info,
-  BarChart2
+  BarChart2,
+  Loader2
 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "motion/react";
@@ -23,26 +24,55 @@ export default function TaxCompliance() {
   const { profile } = useAuth();
   const [revenue, setRevenue] = useState("0");
   const [expenses, setExpenses] = useState("0");
-   const [showAllRecords, setShowAllRecords] = useState(false);
-   const [actionMessage, setActionMessage] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState(profile?.phone_number || "");
+  const [showAllRecords, setShowAllRecords] = useState(false);
+  const [actionMessage, setActionMessage] = useState("");
+  const [isPaying, setIsPaying] = useState(false);
 
   const taxableIncome = Math.max(0, parseFloat(revenue || "0") - parseFloat(expenses || "0"));
   const estimatedTax = taxableIncome * 0.15; // Mock 15% rate
 
-   const handlePay = () => {
+   const handlePay = async () => {
       if (estimatedTax <= 0) {
         setActionMessage("No tax due.");
         return;
       }
-      addRevenueEntry({
-        ref: `TX${Date.now().toString().slice(-6)}`,
-        amount: estimatedTax,
-        user: profile?.name || "Citizen",
-        stream: "SME Tax Payment",
-        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        reconciled: false,
-      });
-      setActionMessage(`M-PESA payment request for KES ${estimatedTax.toLocaleString()} sent. Check your phone for the push prompt.`);
+      if (!phoneNumber || phoneNumber.length < 9) {
+        setActionMessage("Please enter a valid M-PESA phone number.");
+        return;
+      }
+      
+      setIsPaying(true);
+      setActionMessage("Initiating M-PESA payment...");
+      
+      try {
+        const { data, error } = await supabase.functions.invoke("mpesa-stk-push", {
+           body: {
+             phone: phoneNumber.startsWith("0") ? `254${phoneNumber.substring(1)}` : phoneNumber,
+             amount: estimatedTax,
+             accountReference: `SME-TAX-${Date.now().toString().slice(-4)}`
+           }
+        });
+        
+        if (error) throw error;
+        
+        // Log to revenue table for ledger tracking
+        addRevenueEntry({
+          ref: `TX${Date.now().toString().slice(-6)}`,
+          amount: estimatedTax,
+          user: profile?.name || "Citizen",
+          stream: "SME Tax Payment",
+          time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+          reconciled: false,
+        });
+        
+        setActionMessage(`Success! M-PESA prompt sent to ${phoneNumber}. Please complete the payment on your phone.`);
+      } catch (err: any) {
+        console.error(err);
+        setActionMessage(`Payment failed: ${err.message || "Could not reach M-PESA gateway."}`);
+      } finally {
+        setIsPaying(false);
+      }
    };
 
    const handleConfigureBridge = () => {
@@ -146,19 +176,32 @@ export default function TaxCompliance() {
                        <span className="text-sm font-bold text-gray-500">Taxable Net Income:</span>
                        <span className="text-lg font-black text-gray-900">KES {taxableIncome.toLocaleString()}</span>
                     </div>
-                    <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-200">
+                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
                        <span className="text-sm font-bold text-gray-500 italic">Effective Rate:</span>
                        <span className="text-lg font-black text-emerald-600">15.0%</span>
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-4">
                        <span className="text-sm font-black text-gray-900 uppercase">Estimated Tax Due:</span>
                        <span className="text-2xl font-black text-blue-600 underline">KES {estimatedTax.toLocaleString()}</span>
                     </div>
-                    <button type="button" onClick={handlePay} className="w-full mt-6 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-200">
-                       <Smartphone className="w-4 h-4" /> Pay via M-PESA Push
+                    
+                    <div className="mb-4">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">M-PESA Phone Number</label>
+                      <input 
+                        type="tel" 
+                        placeholder="07XX XXX XXX"
+                        value={phoneNumber} 
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm font-bold"
+                      />
+                    </div>
+                    
+                    <button type="button" onClick={handlePay} disabled={isPaying} className="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 disabled:opacity-50 transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-200">
+                       {isPaying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Smartphone className="w-4 h-4" />}
+                       {isPaying ? "Processing..." : "Pay via M-PESA Push"}
                     </button>
                     <p className="mt-3 text-[10px] text-center text-gray-400 font-bold uppercase tracking-widest italic">Direct reconciliation with KRA Ledger</p>
-                    {actionMessage && <p className="mt-3 text-xs font-bold text-emerald-600">{actionMessage}</p>}
+                    {actionMessage && <p className={`mt-3 text-xs font-bold ${actionMessage.includes('failed') ? 'text-red-600' : 'text-emerald-600'}`}>{actionMessage}</p>}
                  </div>
                </div>
             </div>
