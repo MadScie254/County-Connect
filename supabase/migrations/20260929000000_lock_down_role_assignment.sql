@@ -109,3 +109,29 @@ GRANT EXECUTE ON FUNCTION public.is_super_admin() TO authenticated, service_role
 -- which has no auth.uid()):
 --   select public.set_user_role('<auth user uuid>', 'super_admin');
 -- Existing admin profiles keep their role; nothing here demotes anyone.
+
+-- 6. "Admins can read all profiles" looked the caller up in profiles from inside a policy on profiles, which
+--    Postgres rejects as infinite recursion on every read of profiles by a signed-in user: their own profile,
+--    profile edits, and every policy on other tables that checks for an admin. The check now runs in a
+--    SECURITY DEFINER function, which reads profiles without applying its policies.
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = (SELECT auth.uid()) AND role IN ('admin', 'super_admin')
+  );
+$$;
+
+REVOKE ALL ON FUNCTION public.is_admin() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, service_role;
+
+DROP POLICY IF EXISTS "Admins can read all profiles" ON public.profiles;
+CREATE POLICY "Admins can read all profiles" ON public.profiles
+  FOR SELECT
+  TO authenticated
+  USING ((SELECT public.is_admin()));
