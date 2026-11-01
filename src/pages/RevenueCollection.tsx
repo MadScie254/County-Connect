@@ -13,6 +13,9 @@ const TARGET_WIDTH_CLASSES: Record<string, string> = {
    "40%": "w-2/5",
 };
 
+/** Clock time of a payment (the revenue table stores created_at, not a separate time column). */
+const timeOf = (iso: string) => new Date(iso).toLocaleTimeString("en-KE", { hour: "2-digit", minute: "2-digit" });
+
 export default function RevenueCollection() {
    const [advancedReconEnabled, setAdvancedReconEnabled] = useState(false);
    const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,7 +64,7 @@ export default function RevenueCollection() {
            </div>
             <div className="flex gap-12 animate-marquee whitespace-nowrap font-mono text-sm">
               {recentEntries.map((entry, idx) => (
-                <span key={idx}>[{entry.time}] {entry.user}: {formatCurrency(entry.amount)} {entry.reconciled ? "RECONCILED" : "PENDING"} (ref: {entry.ref})</span>
+                <span key={idx}>[{timeOf(entry.created_at)}] {entry.payer_name}: {formatCurrency(entry.amount)} {entry.reconciled ? "RECONCILED" : "PENDING"} (ref: {entry.ref})</span>
               ))}
             </div>
         </div>
@@ -152,7 +155,7 @@ export default function RevenueCollection() {
                     {revenueEntries.slice(0, 5).map((entry, idx) => (
                        <div key={idx} className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition group cursor-default">
                           <div className="flex items-center gap-4">
-                             <p className="text-emerald-400 font-mono text-sm">{entry.time}</p>
+                             <p className="text-emerald-400 font-mono text-sm">{timeOf(entry.created_at)}</p>
                              <div>
                                 <p className="text-sm font-bold text-white group-hover:text-emerald-400 transition">{entry.stream}</p>
                                 <p className="text-[10px] text-gray-500 font-mono italic">{entry.ref}</p>

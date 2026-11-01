@@ -35,6 +35,9 @@ ALTER TABLE public.revenue ALTER COLUMN id SET DEFAULT gen_random_uuid();
 ALTER TABLE public.revenue ADD PRIMARY KEY (id);
 
 ALTER TABLE public.revenue ALTER COLUMN time SET DATA TYPE TIMESTAMPTZ USING NOW();
+-- A database built from the full schema already has created_at next to time; the table was emptied above, so the
+-- old created_at is dropped and time takes its place. Databases where this already ran are not affected.
+ALTER TABLE public.revenue DROP COLUMN IF EXISTS created_at;
 ALTER TABLE public.revenue RENAME COLUMN time TO created_at;
 ALTER TABLE public.revenue ADD COLUMN IF NOT EXISTS county_slug TEXT;
 

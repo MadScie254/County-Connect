@@ -20,7 +20,7 @@ import {
   Database,
   Coins,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
@@ -40,6 +40,24 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const selectedCounty = getSelectedCounty();
+
+  // The mobile menu closes when the page changes and on Escape, and the page behind it does not scroll while it is open.
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSidebarOpen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [sidebarOpen]);
 
   const citizenLinks = [
     { name: "Main Modules", type: "header" },
@@ -88,8 +106,11 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
           <span>County Connect</span>
         </Link>
         <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+          type="button"
+          onClick={() => setSidebarOpen((open) => !open)}
           className="p-2 rounded-md hover:bg-gray-100"
+          aria-expanded={sidebarOpen}
+          aria-controls="mobile-sidebar"
           aria-label={sidebarOpen ? "Close menu" : "Open menu"}
           title={sidebarOpen ? "Close menu" : "Open menu"}
         >
@@ -98,10 +119,21 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
       </div>
 
       <div className="flex h-screen overflow-hidden">
+        {/* Tapping outside the open mobile menu closes it */}
+        {sidebarOpen && (
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden fixed inset-0 z-20 bg-black/40"
+          />
+        )}
+
         {/* Sidebar */}
         <AnimatePresence>
           {(sidebarOpen || (typeof window !== 'undefined' && window.innerWidth >= 1024)) && (
             <motion.aside
+              id="mobile-sidebar"
               initial={{ x: -300, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -300, opacity: 0 }}
