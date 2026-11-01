@@ -6,9 +6,9 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 
 export default function CitizenApplicationDetail() {
   const { id } = useParams();
-  const { data: application, isLoading } = useApplicationById(id || "");
+  const { data: application, loading } = useApplicationById(id || "");
 
-  if (isLoading) return <DashboardLayout role="citizen"><div className="p-8">Loading...</div></DashboardLayout>;
+  if (loading) return <DashboardLayout role="citizen"><div className="p-8">Loading...</div></DashboardLayout>;
   if (!application) return <DashboardLayout role="citizen"><div className="p-8">Application not found.</div></DashboardLayout>;
 
   const StatusIcon = {
